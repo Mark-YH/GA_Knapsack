@@ -2,13 +2,14 @@
 // Created by Mark Hsu on 2019-07-08.
 //
 
-#define GENERATION 1000
-#define POPULATION_NUM 4
+#define GENERATION 5000
+#define POPULATION_SIZE 4
 #define GENE_LENGTH 100
-#define MUTATION_RATE 5 // percentage, e.g., 10 stands for  10%
+#define MUTATION_RATE 20 // percentage, e.g., 10 stands for  10%
+#define CROSSOVER_RATE 50
 #define KNAPSACK_SIZE 275 // number of max knapsack size
 #define ALPHA 10 // punishment coefficient
-#define DEBUG_MODE 1
+#define DEBUG_MODE 0
 
 typedef struct tag_parent_t {
     int gene[GENE_LENGTH];
@@ -23,7 +24,7 @@ const int value[10] = {6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 
 void init();
 
-void fitness();
+void calcFitness(parent_t *x);
 
 void selectTournament();
 
@@ -45,6 +46,6 @@ void showResult();
 
 int *getResultCnt();
 
-int *getResult();
+parent_t *getResult();
 
-int myRandom(int);
+int myRandom(int, int);

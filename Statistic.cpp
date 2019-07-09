@@ -14,30 +14,30 @@ int cntOverweight = 0;
 int totalValue = 0;
 int bestValue = 0;
 int bestWeight = 0;
+int bestFitness = 0;
 int bestCase[10];
+parent_t *best;
 
-
-bool isOverweight(int weight) {
-    return weight > KNAPSACK_SIZE;
+bool isOverweight(int w) {
+    return w > KNAPSACK_SIZE;
 }
 
 void statistic() {
-    int *p, val;
+    best = getResult();
 
-    p = getResult();
-
-    if (isOverweight(*p)) {
+    if (isOverweight(best->weight)) {
         cntOverweight++;
         if (DEBUG_MODE)
             cout << "Overweight!!!" << endl;
     }
 
-    val = *(p + 1);
-    totalValue += val;
+    totalValue += best->value;
 
-    if (val > bestValue) {
-        bestValue = val;
-        bestWeight = *p;
+    if (best->fitness > bestFitness) {
+        bestWeight = best->weight;
+        bestValue = best->value;
+        bestFitness = best->fitness;
+
         int *ptrBestCase = getResultCnt();
 
         for (int k = 0; k < 10; k++) {
@@ -47,11 +47,11 @@ void statistic() {
 }
 
 void finalResult() {
-    cout << "==================== REPORT ====================\n";
+    cout << "==================== STATISTIC ====================\n";
     cout << "Knapsack size: " << KNAPSACK_SIZE << endl;
     cout << "Round: " << ROUND << endl;
     cout << "Generation: " << GENERATION << endl;
-    cout << "Population: " << POPULATION_NUM << endl;
+    cout << "Population: " << POPULATION_SIZE << endl;
     cout << "Mutation rate: " << MUTATION_RATE << "%" << endl;
     cout << "Punishment coefficient: " << ALPHA << endl << endl;
 
@@ -60,14 +60,16 @@ void finalResult() {
          << setw(16) << "Overweight rate" << " |"
          << setw(17) << "Best case weight" << " |"
          << setw(11) << "Avg. value" << " |"
-         << setw(11) << "Best value" << endl;
+         << setw(11) << "Best value" << " |"
+         << setw(13) << "Best fitness" << endl;
 
     cout << setw(17) << cntOverweight << " |"
          << setw(14) << fixed << setprecision(2) << cntOverweight / (float) ROUND * 100
          << setw(2) << " %" << " |"
          << setw(17) << bestWeight << " |"
          << setw(11) << setprecision(2) << totalValue / (float) ROUND << " |"
-         << setw(11) << bestValue << endl;
+         << setw(11) << bestValue << " |"
+         << setw(13) << bestFitness << endl;
 
     cout << "Best case: ";
     for (int k = 0; k < 10; k++) {
