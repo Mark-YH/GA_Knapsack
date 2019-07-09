@@ -316,5 +316,5 @@ int *getResultCnt() {
 }
 
 parent_t *getResult() {
-`    return &bestGene;
+    return &bestGene;
 }
