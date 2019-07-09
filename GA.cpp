@@ -236,10 +236,10 @@ void mutateMP() {
         memcpy(&bestGene, &population[i], sizeof(parent_t));
     }
 
-    if (DEBUG_MODE) {
-        cout << "========== Multiple-Point Mutation ==========" << endl;
-        showState();
-    }
+#if DEBUG_MODE
+    cout << "========== Multiple-Point Mutation ==========" << endl;
+    showState();
+#endif
 }
 
 // Print each chromosome state
