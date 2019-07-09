@@ -5,11 +5,11 @@
 #include <iostream>
 #include <stdlib.h>
 #include <random>
+#include <iomanip>
 
 using namespace std;
 
-//int valBest1, valBest2, iBest1, iBest2;
-int cntResult[10];
+//int cntResult[10];
 parent_t population[POPULATION_SIZE];
 parent_t pool[POPULATION_SIZE];
 parent_t bestGene;
@@ -27,24 +27,6 @@ parent_t bestGene;
  * [101] for fitness.
  */
 
-
-void testBestCase() {
-    for (int i = 0; i < POPULATION_SIZE; i++) {
-        for (int j = 0; j < 68; j++) {
-            population[i].gene[j] = 1;
-        }
-        for (int k = 68; k < 100; k++) {
-            if (k == 80) {
-                population[i].gene[k] = 1;
-            } else {
-                population[i].gene[k] = 0;
-            }
-        }
-        calcFitness(&population[i]);
-    }
-    showState();
-}
-
 int myRandom(int start, int end) {
     random_device rd;
     default_random_engine gen = std::default_random_engine(rd());
@@ -55,9 +37,10 @@ int myRandom(int start, int end) {
 void init() {
     for (int i = 0; i < POPULATION_SIZE; i++) {
         for (int j = 0; j < GENE_LENGTH; j++) {
-            population[i].gene[j] = myRandom(0, 1);
-            calcFitness(&population[i]);
+            population[i].gene[j] = myRandom(0, 10);
         }
+        calcFitness(&population[i]);
+
         if (i == 0) {
             memcpy(&bestGene, &population[i], sizeof(parent_t));
         } else if (population[i].fitness > bestGene.fitness) {
@@ -71,52 +54,20 @@ void init() {
 }
 
 void calcFitness(parent_t *x) {
-    int w = 0;// Total weight
-    int v = 0;// Total value
-
+    x->weight = 0;
+    x->value = 0;
     for (int j = 0; j < GENE_LENGTH; j++) {
-        if (j < 10) {
-            w += x->gene[j] * weight[0];
-            v += x->gene[j] * value[0];
-        } else if (j < 20) {
-            w += x->gene[j] * weight[1];
-            v += x->gene[j] * value[1];
-        } else if (j < 30) {
-            w += x->gene[j] * weight[2];
-            v += x->gene[j] * value[2];
-        } else if (j < 40) {
-            w += x->gene[j] * weight[3];
-            v += x->gene[j] * value[3];
-        } else if (j < 50) {
-            w += x->gene[j] * weight[4];
-            v += x->gene[j] * value[4];
-        } else if (j < 60) {
-            w += x->gene[j] * weight[5];
-            v += x->gene[j] * value[5];
-        } else if (j < 70) {
-            w += x->gene[j] * weight[6];
-            v += x->gene[j] * value[6];
-        } else if (j < 80) {
-            w += x->gene[j] * weight[7];
-            v += x->gene[j] * value[7];
-        } else if (j < 90) {
-            w += x->gene[j] * weight[8];
-            v += x->gene[j] * value[8];
-        } else {
-            w += x->gene[j] * weight[9];
-            v += x->gene[j] * value[9];
-        }
-
-        x->weight = w;
-        x->value = v;
-        if (w <= KNAPSACK_SIZE) {
-            x->fitness = v;
-        } else {
-            x->fitness = v - ALPHA * (w - KNAPSACK_SIZE);
-        }
+        x->weight += x->gene[j] * weight[j];
+        x->value += x->gene[j] * value[j];
+    }
+    if (x->weight <= KNAPSACK_SIZE) {
+        x->fitness = x->value;
+    } else {
+        x->fitness = x->value - ALPHA * (x->weight - KNAPSACK_SIZE);
     }
 }
 
+// TODO: 把 select 後的 individual 拿掉，不要重複 select 同一個 individual
 void selectTournament() {
 #if DEBUG_MODE
     cout << "========== Tournament Selection ==========" << endl;
@@ -140,7 +91,7 @@ void selectTournament() {
         if (population[pos1].fitness > population[pos2].fitness) {
             cout << "selected index: [" << pos1 << "]\tfitness: " << population[pos1].fitness << endl;
         } else {
-            cout << "selected index: " << pos2 << "\tfitness: " << population[pos2].fitness << endl;
+            cout << "selected index: [" << pos2 << "]\tfitness: " << population[pos2].fitness << endl;
         }
 #endif
     }
@@ -225,13 +176,13 @@ void mutateSP() {
 // Multiple-Point Mutation
 void mutateMP() {
     for (int i = 0; i < POPULATION_SIZE; i++) {
-//        for (int j = 0; j < GENE_LENGTH; j++) {
-        int j = myRandom(0, GENE_LENGTH - 1);
+        int pos = myRandom(0, GENE_LENGTH - 1); // set mutating position
         if ((myRandom(0, 100)) < MUTATION_RATE) {
-            population[i].gene[j] = 1 - population[i].gene[j];
+            population[i].gene[pos] = myRandom(0, 10);
         }
-//        }
+
         calcFitness(&population[i]);
+
         if (population[i].fitness > bestGene.fitness) {
             memcpy(&bestGene, &population[i], sizeof(parent_t));
         }
@@ -247,10 +198,7 @@ void showState() {
     for (int i = 0; i < POPULATION_SIZE; i++) {
         cout << "population[" << i << "]: ";
         for (int j = 0; j < GENE_LENGTH; j++) {
-            cout << population[i].gene[j];
-            if ((j + 1) % 10 == 0) {
-                cout << ' ';
-            }
+            cout << setw(2) << population[i].gene[j] << ' ';
         }
         cout << endl;
     }
@@ -267,52 +215,16 @@ void showState() {
 void showResult() {
     cout << "========== Result at this round ==========" << endl;
 
-    int *p = getResultCnt();
-
     // See how many each item is taken
     cout << "Best case: ";
-    for (int i = 0; i < 10; i++) {
-        cout << name[i] << ": " << *(p + i) << "  ";
+    for (int i = 0; i < GENE_LENGTH; i++) {
+        cout << name[i] << ": " << bestGene.gene[i] << "  ";
     }
     cout << endl;
 
     cout << "bestGene weight: " << bestGene.weight
          << "\t value: " << bestGene.value
          << "\t fitness: " << bestGene.fitness << endl;
-
-}
-
-int *getResultCnt() {
-    for (int i = 0; i < 10; i++) {
-        cntResult[i] = 0;
-    }
-
-    for (int j = 0; j < GENE_LENGTH; j++) {
-        if (bestGene.gene[j] > 0) {
-            if (j < 10) {
-                cntResult[0]++;
-            } else if (j < 20) {
-                cntResult[1]++;
-            } else if (j < 30) {
-                cntResult[2]++;
-            } else if (j < 40) {
-                cntResult[3]++;
-            } else if (j < 50) {
-                cntResult[4]++;
-            } else if (j < 60) {
-                cntResult[5]++;
-            } else if (j < 70) {
-                cntResult[6]++;
-            } else if (j < 80) {
-                cntResult[7]++;
-            } else if (j < 90) {
-                cntResult[8]++;
-            } else {
-                cntResult[9]++;
-            }
-        }
-    }
-    return cntResult;
 }
 
 parent_t *getResult() {

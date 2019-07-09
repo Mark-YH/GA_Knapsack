@@ -38,12 +38,7 @@ void statistic() {
         bestWeight = best->weight;
         bestValue = best->value;
         bestFitness = best->fitness;
-
-        int *ptrBestCase = getResultCnt();
-
-        for (int k = 0; k < 10; k++) {
-            bestCase[k] = *(ptrBestCase + k);
-        }
+        memcpy(bestCase, best->gene, sizeof(bestCase));
     }
 }
 
