@@ -50,7 +50,7 @@ B. 以整數編碼，共 10 個 bit，其中
 經反覆測試，較佳參數如下：
 
 #### Type A
-_**Tournament Selection + Single-Point Crossover + Multiple-Point Mutation**_
+_**Tournament Selection + Single-Point Crossover + Single-Point Mutation**_
 
 Argument as below:
 ```
