@@ -172,7 +172,7 @@ void crossoverSP() {
             pos2 = myRandom(0, POPULATION_SIZE - 1);
         } while (pos1 == pos2);
 
-        if (myRandom(1, 100) > CROSSOVER_RATE) { // do crossover
+        if (myRandom(0, 100) > CROSSOVER_RATE) { // do crossover
             int crossoverPoint = myRandom(1, GENE_LENGTH - 1);
 
             for (int j = 0; j < crossoverPoint; j++) {
@@ -224,18 +224,18 @@ void mutateSP() {
 
 // Multiple-Point Mutation
 void mutateMP() {
-    int i = myRandom(0, POPULATION_SIZE - 1);
-
-    for (int j = 0; j < GENE_LENGTH; j++) {
-        if ((myRandom(1, GENE_LENGTH)) < MUTATION_RATE) {
+    for (int i = 0; i < POPULATION_SIZE; i++) {
+//        for (int j = 0; j < GENE_LENGTH; j++) {
+        int j = myRandom(0, GENE_LENGTH - 1);
+        if ((myRandom(0, 100)) < MUTATION_RATE) {
             population[i].gene[j] = 1 - population[i].gene[j];
         }
+//        }
+        calcFitness(&population[i]);
+        if (population[i].fitness > bestGene.fitness) {
+            memcpy(&bestGene, &population[i], sizeof(parent_t));
+        }
     }
-    calcFitness(&population[i]);
-    if (population[i].fitness > bestGene.fitness) {
-        memcpy(&bestGene, &population[i], sizeof(parent_t));
-    }
-
 #if DEBUG_MODE
     cout << "========== Multiple-Point Mutation ==========" << endl;
     showState();
