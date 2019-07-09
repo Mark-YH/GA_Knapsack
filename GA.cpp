@@ -137,32 +137,31 @@ void crossoverMask() {
 
 // Single-Point Mutation
 void mutateSP() {
-//    if (DEBUG_MODE)
-//        cout << "========== Single-Point Mutation ==========" << endl;
-//    int i = myRandom(POPULATION_SIZE); // choose chromosome
-//    int j = myRandom(10); // choose item type from 'A' to 'J'. e.g., 0 for 'A', ..., 9 for 'J'
-//
-//    for (int k = (j * 10); k < 10; k++) {
-//        if ((myRandom(100)) < MUTATION_RATE) {
-//            gen[i][j] = !gen[i][j];
-//        }
-//    }
+    for (int i = 0; i < POPULATION_SIZE; i++) {
+        int pos = myRandom(0, GENE_LENGTH - 1); // set mutating position
+        if ((myRandom(0, 100)) < MUTATION_RATE) {
+            population[i].gene[pos] = myRandom(0, 10);
+        }
 
+        calcFitness(&population[i]);
 
-//    // need to update fitness and bestGene after mutation
-//    calcFitness(&population[i]);
-//    if (population[i].fitness > bestGene.fitness) {
-//        memcpy(&bestGene, &population[i], sizeof(parent_t));
-//    }
-
+        if (population[i].fitness > bestGene.fitness) {
+            memcpy(&bestGene, &population[i], sizeof(parent_t));
+        }
+    }
+#if DEBUG_MODE
+    cout << "========== Single-Point Mutation ==========" << endl;
+    showState();
+#endif
 }
 
 // Multiple-Point Mutation
 void mutateMP() {
     for (int i = 0; i < POPULATION_SIZE; i++) {
-        int pos = myRandom(0, GENE_LENGTH - 1); // set mutating position
-        if ((myRandom(0, 100)) < MUTATION_RATE) {
-            population[i].gene[pos] = myRandom(0, 10);
+        for (int pos = 0; pos < GENE_LENGTH; pos++) {
+            if ((myRandom(0, 100)) < MUTATION_RATE) {
+                population[i].gene[pos] = myRandom(0, 10);
+            }
         }
 
         calcFitness(&population[i]);
