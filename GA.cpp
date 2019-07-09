@@ -53,7 +53,6 @@ void calcFitness(parent_t *x) {
     }
 }
 
-// TODO: 把 select 後的 individual 拿掉，不要重複 select 同一個 individual
 void selectTournament() {
 #if DEBUG_MODE
     cout << "========== Tournament Selection ==========" << endl;
@@ -71,7 +70,6 @@ void selectTournament() {
         } else {
             memcpy(&pool[i], &population[pos2], sizeof(parent_t));
         }
-
 #if DEBUG_MODE
         cout << "picked genes: index: [" << pos1 << "] and [" << pos2 << "]" << endl;
         if (population[pos1].fitness > population[pos2].fitness) {
