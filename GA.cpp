@@ -9,23 +9,9 @@
 
 using namespace std;
 
-//int cntResult[10];
 parent_t population[POPULATION_SIZE];
 parent_t pool[POPULATION_SIZE];
 parent_t bestGene;
-
-/*
- * The first dimension of gen stands for 4 chromosomes.
- *
- * The second dimension of array of gen:
- *  [0] -  [9] for 'A' which weight = 1 and value = 6
- * [10] - [19] for 'B' which weight = 2 and value = 7
- * ... and so on
- * [90] - [99] for 'J' which weight = 10 and value = 15
- *
- * [100] for weight.
- * [101] for fitness.
- */
 
 int myRandom(int start, int end) {
     random_device rd;
