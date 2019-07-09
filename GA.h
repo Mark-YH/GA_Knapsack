@@ -2,7 +2,7 @@
 // Created by Mark Hsu on 2019-07-08.
 //
 
-#define GENERATION 10
+#define GENERATION 1000
 #define POPULATION_NUM 4
 #define GENE_LENGTH 100
 #define MUTATION_RATE 5 // percentage, e.g., 10 stands for  10%
