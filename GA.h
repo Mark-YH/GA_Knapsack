@@ -3,14 +3,14 @@
 //
 
 #define GENERATION 10
-#define POPULATION 4
+#define POPULATION_NUM 4
 #define GENE_LENGTH 100
 #define MUTATION_RATE 5 // percentage, e.g., 10 stands for  10%
 #define KNAPSACK_SIZE 275 // number of max knapsack size
 #define ALPHA 10 // punishment coefficient
 #define DEBUG_MODE 1
 
-typedef struct parent_t {
+typedef struct tag_parent_t {
     int gene[GENE_LENGTH];
     int weight;
     int value;

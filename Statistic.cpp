@@ -51,7 +51,7 @@ void finalResult() {
     cout << "Knapsack size: " << KNAPSACK_SIZE << endl;
     cout << "Round: " << ROUND << endl;
     cout << "Generation: " << GENERATION << endl;
-    cout << "Population: " << POPULATION << endl;
+    cout << "Population: " << POPULATION_NUM << endl;
     cout << "Mutation rate: " << MUTATION_RATE << "%" << endl;
     cout << "Punishment coefficient: " << ALPHA << endl << endl;
 

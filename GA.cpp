@@ -8,9 +8,10 @@
 
 using namespace std;
 
-int gen[POPULATION][102];
+int gen[POPULATION_NUM][102];
 int valBest1, valBest2, iBest1, iBest2;
 int cntResult[10];
+parent_t population[POPULATION_NUM];
 
 /*
  * The first dimension of gen stands for 4 chromosomes.
@@ -35,7 +36,7 @@ int myRandom(int range) {
 void init() {
     if (DEBUG_MODE)
         cout << "========== Initialization ==========" << endl;
-    for (int i = 0; i < POPULATION; i++) {
+    for (int i = 0; i < POPULATION_NUM; i++) {
         for (int j = 0; j < 100; j++) {
             gen[i][j] = myRandom(2);
         }
@@ -49,7 +50,7 @@ void fitness() {
     }
     int w;// Total weight
     int v;// Total value
-    for (int i = 0; i < POPULATION; i++) {
+    for (int i = 0; i < POPULATION_NUM; i++) {
         w = 0;
         v = 0;
         for (int j = 0; j < 100; j++) {
@@ -107,7 +108,7 @@ void selectTournament() {
     iBest1 = 0;
     iBest2 = 0;
 
-    for (int i = 0; i < POPULATION; i++) {
+    for (int i = 0; i < POPULATION_NUM; i++) {
         if (valBest1 < valBest2) {
             if (gen[i][101] > valBest1) {
                 iBest1 = i;
@@ -158,7 +159,7 @@ void crossoverSP() {
 
     // replace
     int i = 0;
-    for (int j = 0; j < POPULATION; j++) {
+    for (int j = 0; j < POPULATION_NUM; j++) {
         if (j == iBest1 || j == iBest2) {
             // do nothing. parent chromosome won't be replaced
         } else {
@@ -183,7 +184,7 @@ void crossoverMask() {
 void mutateSP() {
     if (DEBUG_MODE)
         cout << "========== Single-Point Mutation ==========" << endl;
-    int i = myRandom(POPULATION); // choose chromosome
+    int i = myRandom(POPULATION_NUM); // choose chromosome
     int j = myRandom(10); // choose item type from 'A' to 'J'. e.g., 0 for 'A', ..., 9 for 'J'
 
     for (int k = (j * 10); k < 10; k++) {
@@ -199,7 +200,7 @@ void mutateMP() {
         cout << "========== Multiple-Point Mutation ==========" << endl;
     int i;
     do {
-        i = myRandom(POPULATION);
+        i = myRandom(POPULATION_NUM);
     } while (i == iBest1 || i == iBest2);
 
     for (int j = 0; j < 100; j++) {
@@ -211,7 +212,7 @@ void mutateMP() {
 
 // Print each chromosome state
 void showState() {
-    for (int i = 0; i < POPULATION; i++) {
+    for (int i = 0; i < POPULATION_NUM; i++) {
         cout << "gen[" << i << "]: ";
         for (int j = 0; j < 100; j++) {
             cout << gen[i][j];
