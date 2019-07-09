@@ -3,7 +3,7 @@
 //
 
 #define GENERATION 10
-#define POPULATION 6
+#define POPULATION 4
 #define GENE_LENGTH 100
 #define MUTATION_RATE 5 // percentage, e.g., 10 stands for  10%
 #define KNAPSACK_SIZE 275 // number of max knapsack size
