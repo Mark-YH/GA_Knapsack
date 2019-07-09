@@ -316,8 +316,5 @@ int *getResultCnt() {
 }
 
 parent_t *getResult() {
-//    static int rs[2];
-//    rs[0] = gen[iBest1][100];
-//    rs[1] = gen[iBest1][101];
-    return &bestGene;
+`    return &bestGene;
 }
