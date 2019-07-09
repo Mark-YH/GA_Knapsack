@@ -15,15 +15,23 @@ int main() {
 
         for (int j = 0; j < GENERATION; j++) {
             // Choose the method you want.
+ #if SELECTION_TYPE == 0
             selectTournament();
-//            selectRW();
-
+#else
+            selectRW();
+#endif
+#if CROSSOVER_TYPE == 0
             crossoverSP();
-//            crossoverMP();
-//            crossoverMask();
-
-//            mutateSP();
+#elif CROSSOVER_TYPE == 1
+            crossoverMP();
+#else
+            crossoverMask();
+#endif
+#if MUTATION_TYPE == 0
+            mutateSP();
+#else
             mutateMP();
+#endif
         }
 #if EACH_ROUND_RESULT
         showResult();
