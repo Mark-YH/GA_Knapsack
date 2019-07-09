@@ -64,10 +64,10 @@ void init() {
             memcpy(&bestGene, &population[i], sizeof(parent_t));
         }
     }
-    if (DEBUG_MODE) {
-        cout << "========== Initialization ==========" << endl;
-        showState();
-    }
+#if DEBUG_MODE
+    cout << "========== Initialization ==========" << endl;
+    showState();
+#endif
 }
 
 void calcFitness(parent_t *x) {
@@ -118,9 +118,9 @@ void calcFitness(parent_t *x) {
 }
 
 void selectTournament() {
-    if (DEBUG_MODE)
-        cout << "========== Tournament Selection ==========" << endl;
-
+#if DEBUG_MODE
+    cout << "========== Tournament Selection ==========" << endl;
+#endif
     int pos1, pos2;
     for (int i = 0; i < POPULATION_SIZE; i++) {
         // pick 2 individuals randomly
@@ -135,14 +135,14 @@ void selectTournament() {
             memcpy(&pool[i], &population[pos2], sizeof(parent_t));
         }
 
-        if (DEBUG_MODE) {
-            cout << "picked genes: index: [" << pos1 << "] and [" << pos2 << "]" << endl;
-            if (population[pos1].fitness > population[pos2].fitness) {
-                cout << "selected index: [" << pos1 << "]\tfitness: " << population[pos1].fitness << endl;
-            } else {
-                cout << "selected index: " << pos2 << "\tfitness: " << population[pos2].fitness << endl;
-            }
+#if DEBUG_MODE
+        cout << "picked genes: index: [" << pos1 << "] and [" << pos2 << "]" << endl;
+        if (population[pos1].fitness > population[pos2].fitness) {
+            cout << "selected index: [" << pos1 << "]\tfitness: " << population[pos1].fitness << endl;
+        } else {
+            cout << "selected index: " << pos2 << "\tfitness: " << population[pos2].fitness << endl;
         }
+#endif
     }
 }
 
@@ -152,16 +152,16 @@ void selectRW() {
 
 // Single-Point Crossover
 void crossoverSP() {
-    if (DEBUG_MODE) {
-        cout << "========== Single-Point Crossover ==========" << endl;
+#if DEBUG_MODE
+    cout << "========== Single-Point Crossover ==========" << endl;
 
-        // See crossover pool
-        cout << "Crossover pool: " << endl;
-        for (int i = 0; i < POPULATION_SIZE; i++) {
-            cout << "index: " << i << "\tweight: " << pool[i].weight << "\tvalue: " << pool[i].value
-                 << "\tfitness: " << pool[i].fitness << endl;
-        }
+    // See crossover pool
+    cout << "Crossover pool: " << endl;
+    for (int i = 0; i < POPULATION_SIZE; i++) {
+        cout << "index: " << i << "\tweight: " << pool[i].weight << "\tvalue: " << pool[i].value
+             << "\tfitness: " << pool[i].fitness << endl;
     }
+#endif
 
     int pos1, pos2;
 

@@ -25,7 +25,9 @@ int main() {
 //            mutateSP();
             mutateMP();
         }
+#if EACH_ROUND_RESULT
         showResult();
+#endif
         statistic();
     }
     finalResult();

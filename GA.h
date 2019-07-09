@@ -2,14 +2,15 @@
 // Created by Mark Hsu on 2019-07-08.
 //
 
-#define GENERATION 5000
-#define POPULATION_SIZE 4
-#define GENE_LENGTH 100
-#define MUTATION_RATE 20 // percentage, e.g., 10 stands for  10%
-#define CROSSOVER_RATE 50
+#define GENERATION 1000 // number of generation
+#define POPULATION_SIZE 4 // number of population
+#define GENE_LENGTH 100 // length of gene
+#define MUTATION_RATE 10 // percentage, e.g., 10 stands for  10%
+#define CROSSOVER_RATE 80 // percentage, e.g., 10 stands for  10%
 #define KNAPSACK_SIZE 275 // number of max knapsack size
 #define ALPHA 10 // punishment coefficient
-#define DEBUG_MODE 0
+#define DEBUG_MODE 0 // print debugging information? 1 for yes, 0 for no
+#define EACH_ROUND_RESULT 0 // print each round result respectively? 1 for yes, 0 for no
 
 typedef struct tag_parent_t {
     int gene[GENE_LENGTH];

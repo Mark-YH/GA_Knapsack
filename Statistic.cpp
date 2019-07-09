@@ -27,8 +27,9 @@ void statistic() {
 
     if (isOverweight(best->weight)) {
         cntOverweight++;
-        if (DEBUG_MODE)
-            cout << "Overweight!!!" << endl;
+#if DEBUG_MODE
+        cout << "Overweight!!!" << endl;
+#endif
     }
 
     totalValue += best->value;
@@ -52,6 +53,7 @@ void finalResult() {
     cout << "Round: " << ROUND << endl;
     cout << "Generation: " << GENERATION << endl;
     cout << "Population: " << POPULATION_SIZE << endl;
+    cout << "Crossover rate: " << CROSSOVER_RATE << "%" << endl;
     cout << "Mutation rate: " << MUTATION_RATE << "%" << endl;
     cout << "Punishment coefficient: " << ALPHA << endl << endl;
 
