@@ -10,7 +10,7 @@
 using namespace std;
 
 parent_t population[POPULATION_SIZE];
-parent_t pool[POPULATION_SIZE];
+parent_t pool[POPULATION_SIZE]; // crossover pool
 parent_t bestGene;
 
 int myRandom(int start, int end) {
@@ -33,6 +33,7 @@ void init() {
             memcpy(&bestGene, &population[i], sizeof(parent_t));
         }
     }
+
 #if DEBUG_MODE
     cout << "========== Initialization ==========" << endl;
     showState();
@@ -42,10 +43,12 @@ void init() {
 void calcFitness(parent_t *x) {
     x->weight = 0;
     x->value = 0;
+
     for (int j = 0; j < GENE_LENGTH; j++) {
         x->weight += x->gene[j] * weight[j];
         x->value += x->gene[j] * value[j];
     }
+
     if (x->weight <= KNAPSACK_SIZE) {
         x->fitness = x->value;
     } else {
@@ -54,10 +57,8 @@ void calcFitness(parent_t *x) {
 }
 
 void selectTournament() {
-#if DEBUG_MODE
-    cout << "========== Tournament Selection ==========" << endl;
-#endif
     int pos1, pos2;
+
     for (int i = 0; i < POPULATION_SIZE; i++) {
         // pick 2 individuals randomly
         pos1 = myRandom(0, POPULATION_SIZE - 1);
@@ -70,7 +71,9 @@ void selectTournament() {
         } else {
             memcpy(&pool[i], &population[pos2], sizeof(parent_t));
         }
+
 #if DEBUG_MODE
+        cout << "========== Tournament Selection ==========" << endl;
         cout << "picked genes: index: [" << pos1 << "] and [" << pos2 << "]" << endl;
         if (population[pos1].fitness > population[pos2].fitness) {
             cout << "selected index: [" << pos1 << "]\tfitness: " << population[pos1].fitness << endl;
@@ -81,19 +84,81 @@ void selectTournament() {
     }
 }
 
+/** Roulette Wheel Selection
+ * probability = fitness / totalFitness
+ *
+ * E.g., we have four individuals, and its probability is as below respectively:
+ *  A    B   C   D
+ * 0.15 0.3 0.2 0.35 -> 15% 30% 20% 35%
+ *
+ * randomly generate a number 'arrow' belongs to [0, 100]
+ * [1, 15] -> arrow points to A
+ * [16, 45] -> arrow points to B
+ * [46, 65] -> arrow points to C
+ * [66, 100] -> arrow points to D
+ *
+ * so now we could generalize a conclusion from above example
+ * scope[0] belongs to [1, p1]
+ * scope[1] belongs to [p1, p1+p2]
+ * scope[2] belongs to [p1+p2, p1+p2+p3]
+ * scope[3] belongs to [p1+p2+p3, p1+p2+p3+p4]
+ */
 void selectRW() {
+    float probabilities[POPULATION_SIZE], scope[POPULATION_SIZE];
+    int arrow, totalFitness = 0;
+//TODO: 解決total fitness 為負數的情況，但不可降低punishment coefficient
+    for (int i = 0; i < POPULATION_SIZE; i++) {
+        totalFitness += population[i].fitness; // count total fitness
+    }
 
+    for (int i = 0; i < POPULATION_SIZE; i++) {
+        probabilities[i] = population[i].fitness / (float) totalFitness * 100; // calculate probabilities
+
+        if (i == 0)
+            scope[0] = probabilities[0];
+        else
+            scope[i] = scope[i - 1] + probabilities[i];
+    }
+
+#if DEBUG_MODE
+    cout << "========== Roulette Wheel Selection ==========" << endl;
+    cout << "total fitness: " << totalFitness << endl;
+    for (int i = 0; i < POPULATION_SIZE; i++) {
+        cout << "probabilities[" << i << "]: " << probabilities[i] << endl;
+    }
+    for (int i = 0; i < POPULATION_SIZE; i++) {
+        cout << "scope[" << i << "]: " << scope[i] << endl;
+    }
+#endif
+
+    for (int i = 0; i < POPULATION_SIZE; i++) {
+        arrow = myRandom(1, 100); // arrow points to [1, 100] randomly
+
+#if DEBUG_MODE
+        cout << "arrow points at: " << arrow << endl;
+#endif
+
+        for (int j = 0; j < POPULATION_SIZE; j++) {
+            if (arrow < scope[j]) { // arrow points to population[i], i.e., Select population[i]
+#if DEBUG_MODE
+                cout << "selected index: [" << j << "]\tfitness: " << population[j].fitness << endl;
+#endif
+                memcpy(&pool[i], &population[j], sizeof(parent_t));
+                break; // break for loop if you already selected.
+            }
+        }
+    }
 }
 
 // Single-Point Crossover
 void crossoverSP() {
 #if DEBUG_MODE
     cout << "========== Single-Point Crossover ==========" << endl;
-
-    // See crossover pool
     cout << "Crossover pool: " << endl;
-    for (int i = 0; i < POPULATION_SIZE; i++) {
-        cout << "index: " << i << "\tweight: " << pool[i].weight << "\tvalue: " << pool[i].value
+    for (int i = 0; i < POPULATION_SIZE; i++) { // print crossover pool
+        cout << "index: " << i
+             << "\tweight: " << pool[i].weight
+             << "\tvalue: " << pool[i].value
              << "\tfitness: " << pool[i].fitness << endl;
     }
 #endif
@@ -103,6 +168,7 @@ void crossoverSP() {
     for (int i = 0; i < POPULATION_SIZE; i += 2) { // 交配一次生出2個child, 所以+=2
         // pick 2 individuals randomly
         pos1 = myRandom(0, POPULATION_SIZE - 1);
+
         do {
             pos2 = myRandom(0, POPULATION_SIZE - 1);
         } while (pos1 == pos2);
@@ -114,12 +180,14 @@ void crossoverSP() {
                 population[i].gene[j] = pool[pos1].gene[j];
                 population[i + 1].gene[j] = pool[pos2].gene[j];
             }
+
             for (int j = crossoverPoint; j < GENE_LENGTH; j++) {
                 population[i + 1].gene[j] = pool[pos1].gene[j];
                 population[i].gene[j] = pool[pos2].gene[j];
             }
             calcFitness(&population[i]);
             calcFitness(&population[i + 1]);
+
         } else { // don't crossover
             memcpy(&population[i], &pool[pos1], sizeof(parent_t));
             memcpy(&population[i + 1], &pool[pos1], sizeof(parent_t));
@@ -180,15 +248,18 @@ void mutateMP() {
 void showState() {
     for (int i = 0; i < POPULATION_SIZE; i++) {
         cout << "population[" << i << "]: ";
+
         for (int j = 0; j < GENE_LENGTH; j++) {
             cout << setw(2) << population[i].gene[j] << ' ';
         }
         cout << endl;
     }
+
     for (int i = 0; i < POPULATION_SIZE; i++) {
         cout << "index: " << i << "\tweight: " << population[i].weight << "\tvalue: " << population[i].value
              << "\tfitness: " << population[i].fitness << endl;
     }
+
     cout << "Best gene weight: " << bestGene.weight
          << "\tvalue: " << bestGene.value
          << "\tfitness: " << bestGene.fitness << endl;
@@ -197,9 +268,9 @@ void showState() {
 // Print the number of items taken
 void showResult() {
     cout << "========== Result at this round ==========" << endl;
+    cout << "Best case: ";
 
     // See how many each item is taken
-    cout << "Best case: ";
     for (int i = 0; i < GENE_LENGTH; i++) {
         cout << name[i] << ": " << bestGene.gene[i] << "  ";
     }
