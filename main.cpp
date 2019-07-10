@@ -15,7 +15,7 @@ int main() {
 
         for (int j = 0; j < GENERATION; j++) {
             // Choose the method you want.
- #if SELECTION_TYPE == 0
+#if SELECTION_TYPE == 0
             selectTournament();
 #else
             selectRW();
