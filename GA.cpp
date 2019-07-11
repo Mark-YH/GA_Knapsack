@@ -111,13 +111,29 @@ void selectTournament() {
 void selectRW() {
     float probabilities[POPULATION_SIZE], scope[POPULATION_SIZE];
     int arrow, totalFitness = 0;
-//TODO: 解決total fitness 為負數的情況，但不可降低punishment coefficient
+
+    int tmpPool[POPULATION_SIZE];
+    int lowest = 620;
+
     for (int i = 0; i < POPULATION_SIZE; i++) {
-        totalFitness += population[i].fitness; // count total fitness
+        tmpPool[i] = population[i].fitness;
+        if (lowest > population[i].fitness)
+            lowest = population[i].fitness;
+    }
+
+    if (lowest < 0) {
+        lowest *= -1;
+        for (int i = 0; i < POPULATION_SIZE; i++) {
+            tmpPool[i] += lowest;
+        }
     }
 
     for (int i = 0; i < POPULATION_SIZE; i++) {
-        probabilities[i] = population[i].fitness / (float) totalFitness * 100; // calculate probabilities
+        totalFitness += tmpPool[i]; // count total fitness
+    }
+
+    for (int i = 0; i < POPULATION_SIZE; i++) {
+        probabilities[i] = tmpPool[i] / (float) totalFitness * 100; // calculate probabilities
 
         if (i == 0)
             scope[0] = probabilities[0];
@@ -127,7 +143,6 @@ void selectRW() {
 
 #if DEBUG_MODE
     cout << "========== Roulette Wheel Selection ==========" << endl;
-    cout << "total fitness: " << totalFitness << endl;
     for (int i = 0; i < POPULATION_SIZE; i++) {
         cout << "probabilities[" << i << "]: " << probabilities[i] << endl;
     }
@@ -145,10 +160,10 @@ void selectRW() {
 
         for (int j = 0; j < POPULATION_SIZE; j++) {
             if (arrow < scope[j]) { // arrow points to population[i], i.e., Select population[i]
+                memcpy(&pool[i], &population[j], sizeof(parent_t));
 #if DEBUG_MODE
                 cout << "selected index: [" << j << "]\tfitness: " << population[j].fitness << endl;
 #endif
-                memcpy(&pool[i], &population[j], sizeof(parent_t));
                 break; // break for loop if you already selected.
             }
         }
@@ -191,7 +206,7 @@ void crossoverSP() {
 #if DEBUG_MODE
             cout << "pool[" << iPool1
                  << "] and pool[" << iPool2
-                 << "] crossover start with position: [" << crossoverPoint << ']' << endl;
+                 << "] crossover start at position: [" << crossoverPoint << ']' << endl;
             cout << "replaced population[" << i
                  << "] and population[" << i + 1
                  << "] with newborn children" << endl;
