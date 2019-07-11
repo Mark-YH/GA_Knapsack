@@ -163,7 +163,7 @@ void crossoverSP() {
     int pos1, pos2;
 
     for (int i = 0; i < POPULATION_SIZE; i += 2) { // 交配一次生出2個child, 所以+=2
-        // pick 2 individuals randomly
+        // pick 2 individuals in pool randomly
         pos1 = myRandom(0, POPULATION_SIZE - 1);
 
         do {
@@ -190,14 +190,14 @@ void crossoverSP() {
 #if DEBUG_MODE
             cout << "pool[" << pos1
                  << "] and pool[" << pos2
-                 << "] do crossover at crossover point: [" << crossoverPoint << ']' << endl;
+                 << "] crossover start with position: [" << crossoverPoint << ']' << endl;
             cout << "replaced population[" << i
                  << "] and population[" << i + 1
                  << "] with newborn children" << endl;
 #endif
-        } else { // don't crossover
-            memcpy(&population[i], &pool[pos1], sizeof(parent_t));
-            memcpy(&population[i + 1], &pool[pos1], sizeof(parent_t));
+        } else { // don't crossover, so just put it back to population
+            memcpy(&population[i], &pool[i], sizeof(parent_t));
+            memcpy(&population[i + 1], &pool[i + 1], sizeof(parent_t));
         }
     }
 
@@ -231,7 +231,6 @@ void crossoverKP() {
     cout << "========== K-Point Crossover ==========" << endl;
 #endif
     //TODO: complete k-point crossover
-
 }
 
 void crossoverMask() {
