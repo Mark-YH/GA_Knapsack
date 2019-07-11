@@ -160,36 +160,36 @@ void crossoverSP() {
     cout << "========== Single-Point Crossover ==========" << endl;
 #endif
 
-    int pos1, pos2;
+    int iPool1, iPool2;
 
-    for (int i = 0; i < POPULATION_SIZE; i += 2) { // 交配一次生出2個child, 所以+=2
-        // pick 2 individuals in pool randomly
-        pos1 = myRandom(0, POPULATION_SIZE - 1);
-
-        do {
-            pos2 = myRandom(0, POPULATION_SIZE - 1);
-        } while (pos1 == pos2);
-
+    for (int i = 0; i < POPULATION_SIZE; i += 2) { // execute crossover once will get two children, so here is i +=2
         if (myRandom(0, 100) < CROSSOVER_RATE) { // do crossover
+            // pick 2 individuals in pool randomly
+            iPool1 = myRandom(0, POPULATION_SIZE - 1);
+            do {
+                iPool2 = myRandom(0, POPULATION_SIZE - 1);
+            } while (iPool1 == iPool2);
+
             // generate a crossover point randomly
             int crossoverPoint = myRandom(1, GENE_LENGTH - 1);
 
             for (int j = 0; j < crossoverPoint; j++) {
-                population[i].gene[j] = pool[pos1].gene[j];
-                population[i + 1].gene[j] = pool[pos2].gene[j];
+                population[i].gene[j] = pool[iPool1].gene[j];
+                population[i + 1].gene[j] = pool[iPool2].gene[j];
             }
 
             for (int j = crossoverPoint; j < GENE_LENGTH; j++) {
-                population[i + 1].gene[j] = pool[pos1].gene[j];
-                population[i].gene[j] = pool[pos2].gene[j];
+                population[i + 1].gene[j] = pool[iPool1].gene[j];
+                population[i].gene[j] = pool[iPool2].gene[j];
             }
+
             // calculate fitness after crossover done
             calcFitness(&population[i]);
             calcFitness(&population[i + 1]);
 
 #if DEBUG_MODE
-            cout << "pool[" << pos1
-                 << "] and pool[" << pos2
+            cout << "pool[" << iPool1
+                 << "] and pool[" << iPool2
                  << "] crossover start with position: [" << crossoverPoint << ']' << endl;
             cout << "replaced population[" << i
                  << "] and population[" << i + 1
@@ -230,7 +230,106 @@ void crossoverKP() {
 #if DEBUG_MODE
     cout << "========== K-Point Crossover ==========" << endl;
 #endif
-    //TODO: complete k-point crossover
+
+    int crossoverPoints[K_POINT_CROSSOVER];
+    int iPool1, iPool2;
+
+    for (int i = 0; i < POPULATION_SIZE; i += 2) { // execute crossover once will get two children, so here is i +=2
+
+        if (myRandom(0, 100) < CROSSOVER_RATE) { // do crossover
+            // generate kp random numbers for crossover points
+            for (int j = 0; j < K_POINT_CROSSOVER; j++) {
+                crossoverPoints[j] = myRandom(1, GENE_LENGTH - 1);
+
+                // check if crossover points repeat
+                int k = 1;
+
+                while (k < K_POINT_CROSSOVER) {
+                    if (j < k) // no need to check if j < k, so break while loop
+                        break;
+
+                    // j > k
+                    if (crossoverPoints[j] == crossoverPoints[j - k]) {
+                        crossoverPoints[j] = myRandom(1, GENE_LENGTH - 1);
+                        k = 1; // when crossoverPoints[i] got a new number, you should recheck from index [j-1] to [0]
+                    } else {
+                        k++;
+                    }
+                }
+            }
+
+            quickSort(crossoverPoints, 0, K_POINT_CROSSOVER - 1); // sort it
+
+            // pick 2 individuals in pool randomly
+            iPool1 = myRandom(0, POPULATION_SIZE - 1);
+            do {
+                iPool2 = myRandom(0, POPULATION_SIZE - 1);
+            } while (iPool1 == iPool2);
+
+
+            for (int k = 0; k < GENE_LENGTH; k++) {
+                if (k < crossoverPoints[0]) {
+                    population[i].gene[k] = pool[iPool1].gene[k];
+                    population[i + 1].gene[k] = pool[iPool2].gene[k];
+                } else if (k < crossoverPoints[1]) {
+                    population[i + 1].gene[k] = pool[iPool1].gene[k];
+                    population[i].gene[k] = pool[iPool2].gene[k];
+                } else if (k < crossoverPoints[2]) {
+                    population[i].gene[k] = pool[iPool1].gene[k];
+                    population[i + 1].gene[k] = pool[iPool2].gene[k];
+                }
+
+            }
+
+            // calculate fitness after crossover done
+            calcFitness(&population[i]);
+            calcFitness(&population[i + 1]);
+
+
+#if DEBUG_MODE
+            cout << "crossover points: ";
+            for (int j = 0; j < K_POINT_CROSSOVER; j++) {
+                cout << crossoverPoints[j] << ' ';
+            }
+
+            cout << endl;
+
+            cout << "pool[" << iPool1
+                 << "] and pool[" << iPool2
+                 << "] crossover start with position: [" << crossoverPoint << ']' << endl;
+            cout << "replaced population[" << i
+                 << "] and population[" << i + 1
+                 << "] with newborn children" << endl;
+#endif
+        } else { // don't crossover, so just put it back to population
+            memcpy(&population[i], &pool[i], sizeof(parent_t));
+            memcpy(&population[i + 1], &pool[i + 1], sizeof(parent_t));
+        }
+    }
+
+#if DEBUG_MODE
+    cout << "Crossover pool: " << endl; // print crossover pool
+
+    for (int i = 0; i < POPULATION_SIZE; i++) {
+        cout << "pool[" << i << "]: ";
+
+        for (int j = 0; j < GENE_LENGTH; j++) {
+            cout << setw(2) << pool[i].gene[j] << ' ';
+        }
+        cout << endl;
+    }
+
+    for (int i = 0; i < POPULATION_SIZE; i++) {
+        cout << "index: " << i
+             << "\tweight: " << pool[i].weight
+             << "\tvalue: " << pool[i].value
+             << "\tfitness: " << pool[i].fitness << endl;
+    }
+
+    // print the state after crossover
+    cout << "Population pool: " << endl;
+    showState();
+#endif
 }
 
 void crossoverMask() {
@@ -347,6 +446,40 @@ void showResult() {
          << "\t fitness: " << bestGene.fitness << endl;
 }
 
-parent_t *getResult() {
+parent_t *getBestGene() {
     return &bestGene;
+}
+
+
+void swap(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+void quickSort(int *arr, int l, int u) {
+    if (l < u) {
+        int i, j, pk;
+        i = l;
+        j = u;
+        pk = arr[l];
+
+        while (i < j) {
+            while (arr[i] < pk) {
+                i += 1;
+            }
+
+            while (arr[j] > pk) {
+                j -= 1;
+            }
+
+            if (i < j) {
+                swap(&arr[i], &arr[j]);
+            }
+        }
+
+        swap(&arr[i], &arr[j]);
+        quickSort(arr, l, j - 1);
+        quickSort(arr, j + 1, u);
+    }
 }
