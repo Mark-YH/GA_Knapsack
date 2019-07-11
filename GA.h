@@ -35,7 +35,7 @@
  */
 #define SELECTION_TYPE 0
 #define CROSSOVER_TYPE 1
-#define K_POINT_CROSSOVER 3
+#define K_POINT_CROSSOVER 8
 #define MUTATION_TYPE 1
 
 typedef struct tag_parent_t {
@@ -67,14 +67,7 @@ void mutateSP();
 
 void mutateMP();
 
-void showState();
-
 void showResult();
 
 parent_t *getBestGene();
 
-int myRandom(int, int);
-
-void quickSort(int *, int, int);
-
-void swap(int *, int *);

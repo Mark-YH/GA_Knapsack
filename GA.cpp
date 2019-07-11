@@ -13,12 +13,14 @@ parent_t population[POPULATION_SIZE];
 parent_t pool[POPULATION_SIZE]; // crossover pool
 parent_t bestGene;
 
-int myRandom(int start, int end) {
-    random_device rd;
-    default_random_engine gen = std::default_random_engine(rd());
-    uniform_int_distribution<int> dis(start, end);
-    return dis(gen);
-}
+void showState();
+
+int myRandom(int, int);
+
+void quickSort(int *, int, int);
+
+void swap(int *, int *);
+
 
 void init() {
     for (int i = 0; i < POPULATION_SIZE; i++) {
@@ -160,12 +162,12 @@ void crossoverSP() {
     cout << "========== Single-Point Crossover ==========" << endl;
 #endif
 
-    int iPool1, iPool2;
-
     for (int i = 0; i < POPULATION_SIZE; i += 2) { // execute crossover once will get two children, so here is i +=2
         if (myRandom(0, 100) < CROSSOVER_RATE) { // do crossover
             // pick 2 individuals in pool randomly
-            iPool1 = myRandom(0, POPULATION_SIZE - 1);
+            int iPool1 = myRandom(0, POPULATION_SIZE - 1);
+
+            int iPool2;
             do {
                 iPool2 = myRandom(0, POPULATION_SIZE - 1);
             } while (iPool1 == iPool2);
@@ -231,12 +233,10 @@ void crossoverKP() {
     cout << "========== K-Point Crossover ==========" << endl;
 #endif
 
-    int crossoverPoints[K_POINT_CROSSOVER];
-    int iPool1, iPool2;
-
     for (int i = 0; i < POPULATION_SIZE; i += 2) { // execute crossover once will get two children, so here is i +=2
 
         if (myRandom(0, 100) < CROSSOVER_RATE) { // do crossover
+            int crossoverPoints[K_POINT_CROSSOVER];
             // generate kp random numbers for crossover points
             for (int j = 0; j < K_POINT_CROSSOVER; j++) {
                 crossoverPoints[j] = myRandom(1, GENE_LENGTH - 1);
@@ -261,30 +261,54 @@ void crossoverKP() {
             quickSort(crossoverPoints, 0, K_POINT_CROSSOVER - 1); // sort it
 
             // pick 2 individuals in pool randomly
-            iPool1 = myRandom(0, POPULATION_SIZE - 1);
+            int iPool1 = myRandom(0, POPULATION_SIZE - 1);
+
+            int iPool2;
             do {
                 iPool2 = myRandom(0, POPULATION_SIZE - 1);
             } while (iPool1 == iPool2);
 
+            struct bucket {
+                int section1;
+                int section2;
+            };
 
-            for (int k = 0; k < GENE_LENGTH; k++) {
-                if (k < crossoverPoints[0]) {
-                    population[i].gene[k] = pool[iPool1].gene[k];
-                    population[i + 1].gene[k] = pool[iPool2].gene[k];
-                } else if (k < crossoverPoints[1]) {
-                    population[i + 1].gene[k] = pool[iPool1].gene[k];
-                    population[i].gene[k] = pool[iPool2].gene[k];
-                } else if (k < crossoverPoints[2]) {
-                    population[i].gene[k] = pool[iPool1].gene[k];
-                    population[i + 1].gene[k] = pool[iPool2].gene[k];
+            bucket buckets[K_POINT_CROSSOVER + 1]; // section1 <= range < section2
+
+            for (int j = 0; j < K_POINT_CROSSOVER + 1; j++) {
+                if (j == 0) { // first one bucket
+                    buckets[j].section1 = 0;
+                    buckets[j].section2 = crossoverPoints[j];
+                } else if (j == K_POINT_CROSSOVER) { // the last one bucket
+                    buckets[j].section1 = crossoverPoints[j - 1];
+                    buckets[j].section2 = GENE_LENGTH;
+                } else { // others bucket
+                    buckets[j].section1 = crossoverPoints[j - 1];
+                    buckets[j].section2 = crossoverPoints[j];
                 }
 
+#if DEBUG_MODE
+                cout << "bucket section1: " << buckets[j].section1
+                     << "\tbucket section2: " << buckets[j].section2 << endl;
+#endif
+            }
+
+            // crossover process
+            for (int k = 0; k < K_POINT_CROSSOVER + 1; k++) { // K_POINT_CROSSOVER + 1 stands for the number of bucket
+                for (int l = buckets[k].section1; l < buckets[k].section2; l++) {
+                    if (k % 2) { // number of bucket is even
+                        population[i].gene[l] = pool[iPool1].gene[l];
+                        population[i + 1].gene[l] = pool[iPool2].gene[l];
+                    } else { // number of bucket is odd
+                        population[i + 1].gene[l] = pool[iPool1].gene[l];
+                        population[i].gene[l] = pool[iPool2].gene[l];
+                    }
+                }
             }
 
             // calculate fitness after crossover done
             calcFitness(&population[i]);
             calcFitness(&population[i + 1]);
-
 
 #if DEBUG_MODE
             cout << "crossover points: ";
@@ -294,13 +318,13 @@ void crossoverKP() {
 
             cout << endl;
 
-            cout << "pool[" << iPool1
-                 << "] and pool[" << iPool2
-                 << "] crossover start with position: [" << crossoverPoint << ']' << endl;
-            cout << "replaced population[" << i
+            cout << "children of pool[" << iPool1
+                 << "] and pool[" << iPool2 << "] ";
+            cout << "have replaced population[" << i
                  << "] and population[" << i + 1
-                 << "] with newborn children" << endl;
+                 << "]" << endl;
 #endif
+
         } else { // don't crossover, so just put it back to population
             memcpy(&population[i], &pool[i], sizeof(parent_t));
             memcpy(&population[i + 1], &pool[i + 1], sizeof(parent_t));
@@ -482,4 +506,11 @@ void quickSort(int *arr, int l, int u) {
         quickSort(arr, l, j - 1);
         quickSort(arr, j + 1, u);
     }
+}
+
+int myRandom(int start, int end) {
+    random_device rd;
+    default_random_engine gen = std::default_random_engine(rd());
+    uniform_int_distribution<int> dis(start, end);
+    return dis(gen);
 }
