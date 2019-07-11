@@ -8,6 +8,12 @@ using namespace std;
 int main() {
     clock_t tStart = clock();
 
+    // Safety check
+#if K_POINT_CROSSOVER > GENE_LENGTH - 1
+    cout << "ERROR: K_POINT_CROSSOVER is out of bound.";
+    return 0;
+#endif
+
     for (int i = 0; i < ROUND; i++) {
         cout << "Round " << (i + 1) << "/" << ROUND << endl;
 
