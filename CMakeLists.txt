@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
-project(01Knapsack_GA)
+project(GA_Knapsack)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(01Knapsack_GA main.cpp GA.cpp GA.h Statistic.cpp Statistic.h)
+add_executable(GA_Knapsack main.cpp GA.cpp GA.h Statistic.cpp Statistic.h)
