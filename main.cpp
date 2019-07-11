@@ -23,7 +23,7 @@ int main() {
 #if CROSSOVER_TYPE == 0
             crossoverSP();
 #elif CROSSOVER_TYPE == 1
-            crossoverMP();
+            crossoverKP();
 #else
             crossoverMask();
 #endif
