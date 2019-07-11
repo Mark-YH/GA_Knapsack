@@ -5,7 +5,6 @@
 #include "Statistic.h"
 #include "GA.h"
 #include <iostream>
-#include <stdlib.h>
 #include <iomanip>
 
 using namespace std;

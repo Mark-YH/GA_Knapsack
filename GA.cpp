@@ -3,7 +3,6 @@
 //
 #include "GA.h"
 #include <iostream>
-#include <stdlib.h>
 #include <random>
 #include <iomanip>
 
@@ -356,10 +355,6 @@ void crossoverKP() {
 #endif
 }
 
-void crossoverMask() {
-
-}
-
 /** Single-Point Mutation
  * only one bit of each individual has a chance to be a mutation point.
  */
@@ -473,7 +468,6 @@ void showResult() {
 parent_t *getBestGene() {
     return &bestGene;
 }
-
 
 void swap(int *a, int *b) {
     int temp = *a;

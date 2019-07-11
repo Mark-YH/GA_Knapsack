@@ -2,7 +2,7 @@
 // Created by Mark Hsu on 2019-07-08.
 //
 
-#define ROUND 10 // how many times you wanna execute GA.cpp
+#define ROUND 5 // how many times you wanna execute GA
 
 bool isOverweight(int);
 
