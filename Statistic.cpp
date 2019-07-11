@@ -23,7 +23,7 @@ bool isOverweight(int w) {
 
 void statistic() {
     parent_t *best;
-    best = getResult();
+    best = getBestGene();
 
     if (isOverweight(best->weight)) {
         cntOverweight++;

@@ -2,29 +2,40 @@
 // Created by Mark Hsu on 2019-07-08.
 //
 
- #define GENERATION 4000 // number of generation
+#define GENERATION 1 // number of generation
 #define POPULATION_SIZE 4 // number of population
-#define GENE_LENGTH 10 // length of gene
 #define MUTATION_RATE 50 // percentage, e.g., 10 stands for  10%
-#define CROSSOVER_RATE 50 // percentage, e.g., 10 stands for  10%
-#define KNAPSACK_SIZE 275 // number of max knapsack size
+#define CROSSOVER_RATE 100 // percentage, e.g., 10 stands for  10%
 #define ALPHA 18 // punishment coefficient
-#define DEBUG_MODE 0 // print debugging information? 1 for yes, 0 for no
-#define EACH_ROUND_RESULT 0 // print each round result respectively? 1 for yes, 0 for no
+#define KNAPSACK_SIZE 275 // number of max knapsack size
+#define GENE_LENGTH 10 // length of gene
+
+/**
+ * DEBUG_MODE 1: print debugging information
+ *            0: do not print debugging information
+ *
+ * EACH_ROUND_RESULT 1: print each round result respectively
+ *                   0: do not print each round result respectively
+ */
+#define DEBUG_MODE 1
+#define EACH_ROUND_RESULT 1
 
 /**
  * SELECTION_TYPE 0: Tournament Selection
- * SELECTION_TYPE 1: Roulette Wheel Selection
+ *                1: Roulette Wheel Selection
  *
  * CROSSOVER_TYPE 0: Single-Point Crossover
- * CROSSOVER_TYPE 1: K-Point Crossover
- * CROSSOVER_TYPE 2: Mask Crossover
+ *                1: K-Point Crossover
+ *                2: Mask Crossover
+ *
+ * K_POINT_CROSSOVER k: set k-point crossover, it should set between 2 and (GENE_LENGTH - 1)
  *
  * MUTATION_TYPE 0: Single-Point Mutation
- * MUTATION_TYPE 1: Multiple-Point Mutation
+ *               1: Multiple-Point Mutation
  */
 #define SELECTION_TYPE 0
-#define CROSSOVER_TYPE 0
+#define CROSSOVER_TYPE 1
+#define K_POINT_CROSSOVER 3
 #define MUTATION_TYPE 1
 
 typedef struct tag_parent_t {
@@ -48,7 +59,7 @@ void selectRW();
 
 void crossoverSP();
 
-void crossoverMP();
+void crossoverKP();
 
 void crossoverMask();
 
@@ -60,6 +71,10 @@ void showState();
 
 void showResult();
 
-parent_t *getResult();
+parent_t *getBestGene();
 
 int myRandom(int, int);
+
+void quickSort(int *, int, int);
+
+void swap(int *, int *);
