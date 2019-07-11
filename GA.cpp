@@ -57,6 +57,10 @@ void calcFitness(parent_t *x) {
 }
 
 void selectTournament() {
+#if DEBUG_MODE
+    cout << "========== Tournament Selection ==========" << endl;
+#endif
+
     int pos1, pos2;
 
     for (int i = 0; i < POPULATION_SIZE; i++) {
@@ -73,13 +77,13 @@ void selectTournament() {
         }
 
 #if DEBUG_MODE
-        cout << "========== Tournament Selection ==========" << endl;
         cout << "picked genes: index: [" << pos1 << "] and [" << pos2 << "]" << endl;
         if (population[pos1].fitness > population[pos2].fitness) {
             cout << "selected index: [" << pos1 << "]\tfitness: " << population[pos1].fitness << endl;
         } else {
             cout << "selected index: [" << pos2 << "]\tfitness: " << population[pos2].fitness << endl;
         }
+        cout << "----------" << endl;
 #endif
     }
 }
@@ -154,13 +158,6 @@ void selectRW() {
 void crossoverSP() {
 #if DEBUG_MODE
     cout << "========== Single-Point Crossover ==========" << endl;
-    cout << "Crossover pool: " << endl;
-    for (int i = 0; i < POPULATION_SIZE; i++) { // print crossover pool
-        cout << "index: " << i
-             << "\tweight: " << pool[i].weight
-             << "\tvalue: " << pool[i].value
-             << "\tfitness: " << pool[i].fitness << endl;
-    }
 #endif
 
     int pos1, pos2;
@@ -173,7 +170,8 @@ void crossoverSP() {
             pos2 = myRandom(0, POPULATION_SIZE - 1);
         } while (pos1 == pos2);
 
-        if (myRandom(0, 100) > CROSSOVER_RATE) { // do crossover
+        if (myRandom(0, 100) < CROSSOVER_RATE) { // do crossover
+            // generate a crossover point randomly
             int crossoverPoint = myRandom(1, GENE_LENGTH - 1);
 
             for (int j = 0; j < crossoverPoint; j++) {
@@ -185,17 +183,54 @@ void crossoverSP() {
                 population[i + 1].gene[j] = pool[pos1].gene[j];
                 population[i].gene[j] = pool[pos2].gene[j];
             }
+            // calculate fitness after crossover done
             calcFitness(&population[i]);
             calcFitness(&population[i + 1]);
 
+#if DEBUG_MODE
+            cout << "pool[" << pos1
+                 << "] and pool[" << pos2
+                 << "] do crossover at crossover point: [" << crossoverPoint << ']' << endl;
+            cout << "replaced population[" << i
+                 << "] and population[" << i + 1
+                 << "] with newborn children" << endl;
+#endif
         } else { // don't crossover
             memcpy(&population[i], &pool[pos1], sizeof(parent_t));
             memcpy(&population[i + 1], &pool[pos1], sizeof(parent_t));
         }
     }
+
+#if DEBUG_MODE
+    cout << "Crossover pool: " << endl; // print crossover pool
+
+    for (int i = 0; i < POPULATION_SIZE; i++) {
+        cout << "pool[" << i << "]: ";
+
+        for (int j = 0; j < GENE_LENGTH; j++) {
+            cout << setw(2) << pool[i].gene[j] << ' ';
+        }
+        cout << endl;
+    }
+
+    for (int i = 0; i < POPULATION_SIZE; i++) {
+        cout << "index: " << i
+             << "\tweight: " << pool[i].weight
+             << "\tvalue: " << pool[i].value
+             << "\tfitness: " << pool[i].fitness << endl;
+    }
+
+    // print the state after crossover
+    cout << "Population pool: " << endl;
+    showState();
+#endif
 }
 
-void crossoverMP() {
+void crossoverKP() {
+#if DEBUG_MODE
+    cout << "========== K-Point Crossover ==========" << endl;
+#endif
+    //TODO: complete k-point crossover
 
 }
 
@@ -203,43 +238,74 @@ void crossoverMask() {
 
 }
 
-// Single-Point Mutation
+/** Single-Point Mutation
+ * only one bit of each individual has a chance to be a mutation point.
+ */
 void mutateSP() {
-    for (int i = 0; i < POPULATION_SIZE; i++) {
-        int pos = myRandom(0, GENE_LENGTH - 1); // set mutating position
-        if ((myRandom(0, 100)) < MUTATION_RATE) {
-            population[i].gene[pos] = myRandom(0, 10);
-        }
-
-        calcFitness(&population[i]);
-
-        if (population[i].fitness > bestGene.fitness) {
-            memcpy(&bestGene, &population[i], sizeof(parent_t));
-        }
-    }
 #if DEBUG_MODE
     cout << "========== Single-Point Mutation ==========" << endl;
+#endif
+
+    for (int i = 0; i < POPULATION_SIZE; i++) {
+        if ((myRandom(0, 100)) < MUTATION_RATE) {
+            int pos = myRandom(0, GENE_LENGTH - 1); // set mutating position
+            population[i].gene[pos] = myRandom(0, 10);
+
+            // calculate fitness if mutation happened
+            calcFitness(&population[i]);
+            // check if best gene changed
+            if (population[i].fitness > bestGene.fitness) {
+                memcpy(&bestGene, &population[i], sizeof(parent_t));
+            }
+
+#if DEBUG_MODE
+            cout << "population[" << i
+                 << "] mutated at position: [" << pos << ']' << endl;
+#endif
+        }
+    }
+
+#if DEBUG_MODE
     showState();
 #endif
 }
 
-// Multiple-Point Mutation
+/** Multiple-Point Mutation
+ * every single bit of each individual has a chance to be a mutation point.
+ */
 void mutateMP() {
+#if DEBUG_MODE
+    cout << "========== Multiple-Point Mutation ==========" << endl;
+#endif
+
     for (int i = 0; i < POPULATION_SIZE; i++) {
+#if DEBUG_MODE
+        cout << "population[" << i
+             << "] mutated at position: ";
+#endif
+
         for (int pos = 0; pos < GENE_LENGTH; pos++) {
             if ((myRandom(0, 100)) < MUTATION_RATE) {
                 population[i].gene[pos] = myRandom(0, 10);
+
+#if DEBUG_MODE
+                cout << "[" << pos << "] ";
+#endif
             }
         }
+#if DEBUG_MODE
+        cout << endl;
+#endif
 
+        // calculate fitness after mutation done
         calcFitness(&population[i]);
-
+        // check if best gene changed
         if (population[i].fitness > bestGene.fitness) {
             memcpy(&bestGene, &population[i], sizeof(parent_t));
         }
     }
+
 #if DEBUG_MODE
-    cout << "========== Multiple-Point Mutation ==========" << endl;
     showState();
 #endif
 }
@@ -260,6 +326,7 @@ void showState() {
              << "\tfitness: " << population[i].fitness << endl;
     }
 
+    cout << "----------" << endl;
     cout << "Best gene weight: " << bestGene.weight
          << "\tvalue: " << bestGene.value
          << "\tfitness: " << bestGene.fitness << endl;
