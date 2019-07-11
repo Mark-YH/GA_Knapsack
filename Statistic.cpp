@@ -16,13 +16,13 @@ int bestValue = 0;
 int bestWeight = 0;
 int bestFitness = 0;
 int bestCase[10];
-parent_t *best;
 
 bool isOverweight(int w) {
     return w > KNAPSACK_SIZE;
 }
 
 void statistic() {
+    parent_t *best;
     best = getResult();
 
     if (isOverweight(best->weight)) {
@@ -44,6 +44,36 @@ void statistic() {
 
 void finalResult() {
     cout << "==================== STATISTIC ====================\n";
+// SELECTION_TYPE 0: Tournament Selection
+//                1: Roulette Wheel Selection
+//
+// CROSSOVER_TYPE 0: Single-Point Crossover
+//                1: K-Point Crossover
+//                2: Mask Crossover
+//
+//  MUTATION_TYPE 0: Single-Point Mutation
+//                1: Multiple-Point Mutation
+
+#if SELECTION_TYPE == 0
+    cout << "Selection type: Tournament" << endl;
+#else
+    cout << "Selection type: Roulette Wheel" << endl;
+#endif
+
+#if CROSSOVER_TYPE == 0
+    cout << "Crossover type: Single-Point" << endl;
+#elif CROSSOVER_TYPE == 1
+    cout << "Crossover type: K-Point" << endl;
+#else
+    cout << "Crossover type: Mask" << endl;
+#endif
+
+#if MUTATION_TYPE == 0
+    cout << "Mutation type: Single-Point" << endl;
+#else
+    cout << "Mutation type: Multiple-Point" << endl;
+#endif
+
     cout << "Knapsack size: " << KNAPSACK_SIZE << endl;
     cout << "Round: " << ROUND << endl;
     cout << "Generation: " << GENERATION << endl;
@@ -51,7 +81,6 @@ void finalResult() {
     cout << "Crossover rate: " << CROSSOVER_RATE << "%" << endl;
     cout << "Mutation rate: " << MUTATION_RATE << "%" << endl;
     cout << "Punishment coefficient: " << ALPHA << endl << endl;
-
 
     cout << setw(17) << "Overweight count" << " |"
          << setw(16) << "Overweight rate" << " |"
