@@ -8,13 +8,13 @@
 
 using namespace std;
 
-parent_t population[POPULATION_SIZE];
+parent_t population[POPULATION_SIZE]; // population pool
 parent_t pool[POPULATION_SIZE]; // crossover pool
 parent_t bestGene;
 
-void showState();
+void showState(); // print detail state of population. mainly use it as debugging.
 
-int myRandom(int, int);
+int myRandom(int, int); // return a random number
 
 void quickSort(int *, int, int);
 
@@ -28,6 +28,7 @@ void init() {
         }
         calcFitness(&population[i]);
 
+        // update the bestGene
         if (i == 0) {
             memcpy(&bestGene, &population[i], sizeof(parent_t));
         } else if (population[i].fitness > bestGene.fitness) {
@@ -45,14 +46,17 @@ void calcFitness(parent_t *x) {
     x->weight = 0;
     x->value = 0;
 
+    // calculate its weight and value
     for (int j = 0; j < GENE_LENGTH; j++) {
         x->weight += x->gene[j] * weight[j];
         x->value += x->gene[j] * value[j];
     }
 
+    // calculate its fitness
     if (x->weight <= KNAPSACK_SIZE) {
         x->fitness = x->value;
-    } else {
+    } else { //TODO: try to make punishment coefficient method to "value - (alpha * value)"
+        // it got a punishment coefficient if it is overweight
         x->fitness = x->value - ALPHA * (x->weight - KNAPSACK_SIZE);
     }
 }
@@ -62,27 +66,28 @@ void selectTournament() {
     cout << "========== Tournament Selection ==========" << endl;
 #endif
 
-    int pos1, pos2;
+    int iPool1, iPool2;
 
     for (int i = 0; i < POPULATION_SIZE; i++) {
         // pick 2 individuals randomly
-        pos1 = myRandom(0, POPULATION_SIZE - 1);
+        iPool1 = myRandom(0, POPULATION_SIZE - 1);
         do {
-            pos2 = myRandom(0, POPULATION_SIZE - 1);
-        } while (pos1 == pos2);
+            iPool2 = myRandom(0, POPULATION_SIZE - 1);
+        } while (iPool1 == iPool2);
 
-        if (population[pos1].fitness > population[pos2].fitness) {
-            memcpy(&pool[i], &population[pos1], sizeof(parent_t));
+        // compare their fitness and then put it in crossover pool
+        if (population[iPool1].fitness > population[iPool2].fitness) {
+            memcpy(&pool[i], &population[iPool1], sizeof(parent_t));
         } else {
-            memcpy(&pool[i], &population[pos2], sizeof(parent_t));
+            memcpy(&pool[i], &population[iPool2], sizeof(parent_t));
         }
 
 #if DEBUG_MODE
-        cout << "picked genes: index: [" << pos1 << "] and [" << pos2 << "]" << endl;
-        if (population[pos1].fitness > population[pos2].fitness) {
-            cout << "selected index: [" << pos1 << "]\tfitness: " << population[pos1].fitness << endl;
+        cout << "picked genes: index: [" << iPool1 << "] and [" << iPool2 << "]" << endl;
+        if (population[iPool1].fitness > population[iPool2].fitness) {
+            cout << "selected index: [" << iPool1 << "]\tfitness: " << population[iPool1].fitness << endl;
         } else {
-            cout << "selected index: [" << pos2 << "]\tfitness: " << population[pos2].fitness << endl;
+            cout << "selected index: [" << iPool2 << "]\tfitness: " << population[iPool2].fitness << endl;
         }
         cout << "----------" << endl;
 #endif
@@ -112,8 +117,11 @@ void selectRW() {
     float probabilities[POPULATION_SIZE], scope[POPULATION_SIZE];
     int arrow, totalFitness = 0;
 
-    int tmpPool[POPULATION_SIZE];
-    int lowest = 620;
+// TODO: no need to do this after make new punishment coefficient active
+    // in order to prevent any negative fitness
+    // take the lowest number as an offset if it is negative
+    int tmpPool[POPULATION_SIZE]; // create a temporary pool for adjusted fitness
+    int lowest = 0;
 
     for (int i = 0; i < POPULATION_SIZE; i++) {
         tmpPool[i] = population[i].fitness;
@@ -121,10 +129,11 @@ void selectRW() {
             lowest = population[i].fitness;
     }
 
+    // if there is a negative fitness, add an offset which is the lowest number
     if (lowest < 0) {
-        lowest *= -1;
+        lowest *= -1; // make it positive
         for (int i = 0; i < POPULATION_SIZE; i++) {
-            tmpPool[i] += lowest;
+            tmpPool[i] += lowest; // add the offset
         }
     }
 
@@ -135,6 +144,7 @@ void selectRW() {
     for (int i = 0; i < POPULATION_SIZE; i++) {
         probabilities[i] = tmpPool[i] / (float) totalFitness * 100; // calculate probabilities
 
+        // create scope array
         if (i == 0)
             scope[0] = probabilities[0];
         else
@@ -152,19 +162,20 @@ void selectRW() {
 #endif
 
     for (int i = 0; i < POPULATION_SIZE; i++) {
-        arrow = myRandom(1, 100); // arrow points to [1, 100] randomly
+        arrow = myRandom(0, 100); // arrow points to [1, 100] randomly
 
 #if DEBUG_MODE
         cout << "arrow points at: " << arrow << endl;
 #endif
 
         for (int j = 0; j < POPULATION_SIZE; j++) {
-            if (arrow < scope[j]) { // arrow points to population[i], i.e., Select population[i]
+            if (arrow < scope[j]) {
+                // arrow points to population[j], i.e., copy population[j] to crossover pool
                 memcpy(&pool[i], &population[j], sizeof(parent_t));
 #if DEBUG_MODE
                 cout << "selected index: [" << j << "]\tfitness: " << population[j].fitness << endl;
 #endif
-                break; // break for loop if you already selected.
+                break; // break for-loop if you already selected.
             }
         }
     }
@@ -178,17 +189,18 @@ void crossoverSP() {
 
     for (int i = 0; i < POPULATION_SIZE; i += 2) { // execute crossover once will get two children, so here is i +=2
         if (myRandom(0, 100) < CROSSOVER_RATE) { // do crossover
-            // pick 2 individuals in pool randomly
+            // pick 2 individuals in crossover pool randomly
             int iPool1 = myRandom(0, POPULATION_SIZE - 1);
 
             int iPool2;
             do {
                 iPool2 = myRandom(0, POPULATION_SIZE - 1);
-            } while (iPool1 == iPool2);
+            } while (iPool1 == iPool2); // do it again if pick the same individual
 
             // generate a crossover point randomly
             int crossoverPoint = myRandom(1, GENE_LENGTH - 1);
 
+            // crossover execution
             for (int j = 0; j < crossoverPoint; j++) {
                 population[i].gene[j] = pool[iPool1].gene[j];
                 population[i + 1].gene[j] = pool[iPool2].gene[j];
@@ -247,8 +259,8 @@ void crossoverKP() {
     cout << "========== K-Point Crossover ==========" << endl;
 #endif
 
-    for (int i = 0; i < POPULATION_SIZE; i += 2) { // execute crossover once will get two children, so here is i +=2
-
+    // execute crossover once will get two children, so it is i +=2
+    for (int i = 0; i < POPULATION_SIZE; i += 2) {
         if (myRandom(0, 100) < CROSSOVER_RATE) { // do crossover
             int crossoverPoints[K_POINT_CROSSOVER];
             // generate kp random numbers for crossover points
@@ -257,24 +269,25 @@ void crossoverKP() {
 
                 // check if crossover points repeat
                 int k = 1;
-
                 while (k < K_POINT_CROSSOVER) {
-                    if (j < k) // no need to check if j < k, so break while loop
+                    if (j < k) // no need to check if j < k, so break while-loop
                         break;
 
                     // j > k
                     if (crossoverPoints[j] == crossoverPoints[j - k]) {
                         crossoverPoints[j] = myRandom(1, GENE_LENGTH - 1);
-                        k = 1; // when crossoverPoints[i] got a new number, you should recheck from index [j-1] to [0]
+                        // when crossoverPoints[i] got a new number,
+                        // you should recheck from index [j-1] to [0], so it is k = 1 here
+                        k = 1;
                     } else {
                         k++;
                     }
                 }
             }
 
-            quickSort(crossoverPoints, 0, K_POINT_CROSSOVER - 1); // sort it
+            quickSort(crossoverPoints, 0, K_POINT_CROSSOVER - 1); // sort crossoverPoints
 
-            // pick 2 individuals in pool randomly
+            // pick 2 individuals in crossover pool randomly
             int iPool1 = myRandom(0, POPULATION_SIZE - 1);
 
             int iPool2;
@@ -282,20 +295,25 @@ void crossoverKP() {
                 iPool2 = myRandom(0, POPULATION_SIZE - 1);
             } while (iPool1 == iPool2);
 
+            // use a bucket for dispatching
             struct bucket {
                 int section1;
                 int section2;
             };
 
-            bucket buckets[K_POINT_CROSSOVER + 1]; // section1 <= range < section2
+            // create a bucket array
+            bucket buckets[K_POINT_CROSSOVER + 1];
 
+            // section1 <= range < section2
             for (int j = 0; j < K_POINT_CROSSOVER + 1; j++) {
-                if (j == 0) { // first one bucket
+                if (j == 0) { // first bucket
                     buckets[j].section1 = 0;
                     buckets[j].section2 = crossoverPoints[j];
-                } else if (j == K_POINT_CROSSOVER) { // the last one bucket
+
+                } else if (j == K_POINT_CROSSOVER) { // the last bucket
                     buckets[j].section1 = crossoverPoints[j - 1];
                     buckets[j].section2 = GENE_LENGTH;
+
                 } else { // others bucket
                     buckets[j].section1 = crossoverPoints[j - 1];
                     buckets[j].section2 = crossoverPoints[j];
@@ -308,12 +326,14 @@ void crossoverKP() {
             }
 
             // crossover process
-            for (int k = 0; k < K_POINT_CROSSOVER + 1; k++) { // K_POINT_CROSSOVER + 1 stands for the number of bucket
+            for (int k = 0; k < K_POINT_CROSSOVER + 1; k++) { // "K_POINT_CROSSOVER + 1" stands for the number of bucket
                 for (int l = buckets[k].section1; l < buckets[k].section2; l++) {
-                    if (k % 2) { // number of bucket is even
+                    // dispatching
+                    if (k % 2) { // even number of bucket
                         population[i].gene[l] = pool[iPool1].gene[l];
                         population[i + 1].gene[l] = pool[iPool2].gene[l];
-                    } else { // number of bucket is odd
+
+                    } else { // odd number of bucket
                         population[i + 1].gene[l] = pool[iPool1].gene[l];
                         population[i].gene[l] = pool[iPool2].gene[l];
                     }
@@ -379,11 +399,12 @@ void mutateSP() {
 #endif
 
     for (int i = 0; i < POPULATION_SIZE; i++) {
+        // each individual has a chance to be a mutation point
         if ((myRandom(0, 100)) < MUTATION_RATE) {
             int pos = myRandom(0, GENE_LENGTH - 1); // set mutating position
             population[i].gene[pos] = myRandom(0, 10);
 
-            // calculate fitness if mutation happened
+            // calculate fitness as mutation happened
             calcFitness(&population[i]);
             // check if best gene changed
             if (population[i].fitness > bestGene.fitness) {
@@ -417,6 +438,7 @@ void mutateMP() {
 #endif
 
         for (int pos = 0; pos < GENE_LENGTH; pos++) {
+            // every single bit has a mutation chance
             if ((myRandom(0, 100)) < MUTATION_RATE) {
                 population[i].gene[pos] = myRandom(0, 10);
 

@@ -9,7 +9,7 @@
 
 using namespace std;
 
-int cntOverweight = 0;
+int cntOverweight = 0; // count overweight times
 int totalValue = 0;
 int bestValue = 0;
 int bestWeight = 0;
@@ -20,10 +20,12 @@ bool isOverweight(int w) {
     return w > KNAPSACK_SIZE;
 }
 
+// statistic of result of total rounds
 void statistic() {
     parent_t *best;
     best = getBestGene();
 
+    // check if it is overweight
     if (isOverweight(best->weight)) {
         cntOverweight++;
 #if DEBUG_MODE
@@ -33,6 +35,7 @@ void statistic() {
 
     totalValue += best->value;
 
+    // check if it needs to update best fitness
     if (best->fitness > bestFitness) {
         bestWeight = best->weight;
         bestValue = best->value;
@@ -43,16 +46,6 @@ void statistic() {
 
 void finalResult() {
     cout << "==================== STATISTIC ====================\n";
-// SELECTION_TYPE 0: Tournament Selection
-//                1: Roulette Wheel Selection
-//
-// CROSSOVER_TYPE 0: Single-Point Crossover
-//                1: K-Point Crossover
-//                2: Mask Crossover
-//
-//  MUTATION_TYPE 0: Single-Point Mutation
-//                1: Multiple-Point Mutation
-
 #if SELECTION_TYPE == 0
     cout << "Selection type: Tournament" << endl;
 #else

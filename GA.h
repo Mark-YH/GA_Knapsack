@@ -2,10 +2,10 @@
 // Created by Mark Hsu on 2019-07-08.
 //
 
-#define GENERATION 4000 // number of generation
-#define POPULATION_SIZE 4 // number of population
-#define MUTATION_RATE 50 // percentage, e.g., 10 stands for  10%
+#define GENERATION 5000 // number of generation
+#define POPULATION_SIZE 16 // number of population  4  16
 #define CROSSOVER_RATE 50 // percentage, e.g., 10 stands for  10%
+#define MUTATION_RATE 50 // percentage, e.g., 10 stands for  10%
 #define ALPHA 18 // punishment coefficient
 #define KNAPSACK_SIZE 275 // number of max knapsack size
 #define GENE_LENGTH 10 // length of gene
@@ -33,7 +33,7 @@
  *               1: Multiple-Point Mutation
  */
 #define SELECTION_TYPE 0
-#define CROSSOVER_TYPE 1
+#define CROSSOVER_TYPE 0
 #define K_POINT_CROSSOVER 3
 #define MUTATION_TYPE 0
 
@@ -54,17 +54,16 @@ void calcFitness(parent_t *x);
 
 void selectTournament();
 
-void selectRW();
+void selectRW(); // roulette wheel selection
 
-void crossoverSP();
+void crossoverSP(); // single-point crossover
 
-void crossoverKP();
+void crossoverKP(); // k-point crossover
 
-void mutateSP();
+void mutateSP(); // single-point mutation
 
-void mutateMP();
+void mutateMP(); // multiple-point mutation
 
-void showResult();
+void showResult(); // print result of current round
 
 parent_t *getBestGene();
-
