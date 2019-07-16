@@ -2,11 +2,10 @@
 // Created by Mark Hsu on 2019-07-08.
 //
 
-#define GENERATION 5000 // number of generation
-#define POPULATION_SIZE 16 // number of population  4  16
+#define GENERATION 500 // number of generation
+#define POPULATION_SIZE 300 // number of population
 #define CROSSOVER_RATE 50 // percentage, e.g., 10 stands for  10%
 #define MUTATION_RATE 50 // percentage, e.g., 10 stands for  10%
-#define ALPHA 18 // punishment coefficient
 #define KNAPSACK_SIZE 275 // number of max knapsack size
 #define GENE_LENGTH 10 // length of gene
 

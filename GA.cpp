@@ -55,9 +55,9 @@ void calcFitness(parent_t *x) {
     // calculate its fitness
     if (x->weight <= KNAPSACK_SIZE) {
         x->fitness = x->value;
-    } else { //TODO: try to make punishment coefficient method to "value - (alpha * value)"
+    } else {
         // it got a punishment coefficient if it is overweight
-        x->fitness = x->value - ALPHA * (x->weight - KNAPSACK_SIZE);
+        x->fitness = x->value * (0.9 - ((x->weight - KNAPSACK_SIZE) / (float) (2 * KNAPSACK_SIZE)));
     }
 }
 
@@ -101,48 +101,28 @@ void selectTournament() {
  *  A    B   C   D
  * 0.15 0.3 0.2 0.35 -> 15% 30% 20% 35%
  *
- * randomly generate a number 'arrow' belongs to [0, 100]
- * [1, 15] -> arrow points to A
- * [16, 45] -> arrow points to B
- * [46, 65] -> arrow points to C
- * [66, 100] -> arrow points to D
+ * randomly generate a number 'arrow' belongs to [0, 99]
+ * [0, 15) -> arrow points to A
+ * [15, 45) -> arrow points to B
+ * [45, 65) -> arrow points to C
+ * [65, 100) -> arrow points to D
  *
  * so now we could generalize a conclusion from above example
- * scope[0] belongs to [1, p1]
- * scope[1] belongs to [p1, p1+p2]
- * scope[2] belongs to [p1+p2, p1+p2+p3]
- * scope[3] belongs to [p1+p2+p3, p1+p2+p3+p4]
+ * scope[0] belongs to [0, p1)
+ * scope[1] belongs to [p1, p1+p2)
+ * scope[2] belongs to [p1+p2, p1+p2+p3)
+ * scope[3] belongs to [p1+p2+p3, p1+p2+p3+p4)
  */
 void selectRW() {
     float probabilities[POPULATION_SIZE], scope[POPULATION_SIZE];
     int arrow, totalFitness = 0;
 
-// TODO: no need to do this after make new punishment coefficient active
-    // in order to prevent any negative fitness
-    // take the lowest number as an offset if it is negative
-    int tmpPool[POPULATION_SIZE]; // create a temporary pool for adjusted fitness
-    int lowest = 0;
-
     for (int i = 0; i < POPULATION_SIZE; i++) {
-        tmpPool[i] = population[i].fitness;
-        if (lowest > population[i].fitness)
-            lowest = population[i].fitness;
-    }
-
-    // if there is a negative fitness, add an offset which is the lowest number
-    if (lowest < 0) {
-        lowest *= -1; // make it positive
-        for (int i = 0; i < POPULATION_SIZE; i++) {
-            tmpPool[i] += lowest; // add the offset
-        }
+        totalFitness += population[i].fitness; // count total fitness
     }
 
     for (int i = 0; i < POPULATION_SIZE; i++) {
-        totalFitness += tmpPool[i]; // count total fitness
-    }
-
-    for (int i = 0; i < POPULATION_SIZE; i++) {
-        probabilities[i] = tmpPool[i] / (float) totalFitness * 100; // calculate probabilities
+        probabilities[i] = population[i].fitness / (float) totalFitness * 100; // calculate probabilities
 
         // create scope array
         if (i == 0)
@@ -162,7 +142,7 @@ void selectRW() {
 #endif
 
     for (int i = 0; i < POPULATION_SIZE; i++) {
-        arrow = myRandom(0, 100); // arrow points to [1, 100] randomly
+        arrow = myRandom(0, 99); // arrow points to [0, 99] randomly
 
 #if DEBUG_MODE
         cout << "arrow points at: " << arrow << endl;
@@ -188,7 +168,7 @@ void crossoverSP() {
 #endif
 
     for (int i = 0; i < POPULATION_SIZE; i += 2) { // execute crossover once will get two children, so here is i +=2
-        if (myRandom(0, 100) < CROSSOVER_RATE) { // do crossover
+        if (myRandom(0, 99) < CROSSOVER_RATE) { // do crossover
             // pick 2 individuals in crossover pool randomly
             int iPool1 = myRandom(0, POPULATION_SIZE - 1);
 
@@ -261,7 +241,7 @@ void crossoverKP() {
 
     // execute crossover once will get two children, so it is i +=2
     for (int i = 0; i < POPULATION_SIZE; i += 2) {
-        if (myRandom(0, 100) < CROSSOVER_RATE) { // do crossover
+        if (myRandom(0, 99) < CROSSOVER_RATE) { // do crossover
             int crossoverPoints[K_POINT_CROSSOVER];
             // generate kp random numbers for crossover points
             for (int j = 0; j < K_POINT_CROSSOVER; j++) {
@@ -305,7 +285,7 @@ void crossoverKP() {
             bucket buckets[K_POINT_CROSSOVER + 1];
 
             // section1 <= range < section2
-            for (int j = 0; j < K_POINT_CROSSOVER + 1; j++) {
+            for (int j = 0; j < K_POINT_CROSSOVER + 1; j++) { // "K_POINT_CROSSOVER + 1" stands for the number of bucket
                 if (j == 0) { // first bucket
                     buckets[j].section1 = 0;
                     buckets[j].section2 = crossoverPoints[j];
@@ -400,7 +380,7 @@ void mutateSP() {
 
     for (int i = 0; i < POPULATION_SIZE; i++) {
         // each individual has a chance to be a mutation point
-        if ((myRandom(0, 100)) < MUTATION_RATE) {
+        if ((myRandom(0, 99)) < MUTATION_RATE) {
             int pos = myRandom(0, GENE_LENGTH - 1); // set mutating position
             population[i].gene[pos] = myRandom(0, 10);
 
@@ -439,7 +419,7 @@ void mutateMP() {
 
         for (int pos = 0; pos < GENE_LENGTH; pos++) {
             // every single bit has a mutation chance
-            if ((myRandom(0, 100)) < MUTATION_RATE) {
+            if ((myRandom(0, 99)) < MUTATION_RATE) {
                 population[i].gene[pos] = myRandom(0, 10);
 
 #if DEBUG_MODE
