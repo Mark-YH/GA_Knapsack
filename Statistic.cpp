@@ -6,6 +6,7 @@
 #include "GA.h"
 #include <iostream>
 #include <iomanip>
+#include <cstring>
 
 using namespace std;
 

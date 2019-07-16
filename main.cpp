@@ -1,6 +1,7 @@
 #include "GA.h"
 #include "Statistic.h"
 #include <iostream>
+#include <time.h>
 
 using namespace std;
 

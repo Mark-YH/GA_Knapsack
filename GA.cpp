@@ -5,6 +5,7 @@
 #include <iostream>
 #include <random>
 #include <iomanip>
+#include <cstring>
 
 using namespace std;
 
@@ -521,7 +522,7 @@ void quickSort(int *arr, int l, int u) {
 
 int myRandom(int start, int end) {
     random_device rd;
-    default_random_engine gen = std::default_random_engine(rd());
+    static default_random_engine gen = default_random_engine(rd());
     uniform_int_distribution<int> dis(start, end);
     return dis(gen);
 }
