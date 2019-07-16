@@ -15,6 +15,7 @@ int bestValue = 0;
 int bestWeight = 0;
 int bestFitness = 0;
 int bestCase[10];
+int cntBestCase = 0;
 
 bool isOverweight(int w) {
     return w > KNAPSACK_SIZE;
@@ -31,6 +32,8 @@ void statistic() {
 #if DEBUG_MODE
         cout << "Overweight!!!" << endl;
 #endif
+    } else if (best->fitness == 620) {
+        cntBestCase++;
     }
 
     totalValue += best->value;
@@ -66,20 +69,19 @@ void finalResult() {
     cout << "Mutation type: Multiple-Point" << endl;
 #endif
 
-    cout << "Knapsack size: " << KNAPSACK_SIZE << endl;
     cout << "Round: " << ROUND << endl;
     cout << "Generation: " << GENERATION << endl;
     cout << "Population: " << POPULATION_SIZE << endl;
     cout << "Crossover rate: " << CROSSOVER_RATE << "%" << endl;
-    cout << "Mutation rate: " << MUTATION_RATE << "%" << endl;
-    cout << "Punishment coefficient: " << ALPHA << endl << endl;
+    cout << "Mutation rate: " << MUTATION_RATE << "%" << endl << endl;
 
     cout << setw(17) << "Overweight count" << " |"
          << setw(16) << "Overweight rate" << " |"
          << setw(17) << "Best case weight" << " |"
          << setw(11) << "Avg. value" << " |"
          << setw(11) << "Best value" << " |"
-         << setw(13) << "Best fitness" << endl;
+         << setw(13) << "Best fitness" << " |"
+         << setw(15) << "Best case count" << endl;
 
     cout << setw(17) << cntOverweight << " |"
          << setw(14) << fixed << setprecision(2) << cntOverweight / (float) ROUND * 100
@@ -87,11 +89,14 @@ void finalResult() {
          << setw(17) << bestWeight << " |"
          << setw(11) << setprecision(2) << totalValue / (float) ROUND << " |"
          << setw(11) << bestValue << " |"
-         << setw(13) << bestFitness << endl;
+         << setw(13) << bestFitness << " |"
+         << setw(15) << cntBestCase << endl;
 
     cout << "Best case: ";
     for (int k = 0; k < 10; k++) {
         cout << name[k] << ": " << bestCase[k] << "  ";
     }
     cout << endl;
+
+    std::cout << "\007";
 }
