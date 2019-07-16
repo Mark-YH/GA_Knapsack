@@ -1,4 +1,4 @@
-#using GA solve knapsack problem
+## using GA solve knapsack problem
 
 ### Problem:
 * 有 10 種不同的物品 A~J，每種物品各有10個
