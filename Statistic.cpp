@@ -1,9 +1,8 @@
 //
 // Created by Mark Hsu on 2019-07-08.
 //
-
-#include "Statistic.h"
 #include "GA.h"
+#include "Statistic.h"
 #include <iostream>
 #include <iomanip>
 #include <cstring>
@@ -23,28 +22,25 @@ bool isOverweight(int w) {
 }
 
 // statistic of result of total rounds
-void statistic() {
-    parent_t *best;
-    best = getBestGene();
-
+void statistic(int *best) {
     // check if it is overweight
-    if (isOverweight(best->weight)) {
+    if (isOverweight(best[10])) {
         cntOverweight++;
 #if DEBUG_MODE
         cout << "Overweight!!!" << endl;
 #endif
-    } else if (best->fitness == 620) {
+    } else if (best[12] == 620) {
         cntBestCase++;
     }
 
-    totalValue += best->value;
+    totalValue += best[11];
 
     // check if it needs to update best fitness
-    if (best->fitness > bestFitness) {
-        bestWeight = best->weight;
-        bestValue = best->value;
-        bestFitness = best->fitness;
-        memcpy(bestCase, best->gene, sizeof(bestCase));
+    if (best[12] > bestFitness) {
+        bestWeight = best[10];
+        bestValue = best[11];
+        bestFitness = best[12];
+        memcpy(bestCase, best, sizeof(int) * GENE_LENGTH);
     }
 }
 
@@ -98,6 +94,4 @@ void finalResult() {
         cout << name[k] << ": " << bestCase[k] << "  ";
     }
     cout << endl;
-
-    std::cout << "\007";
 }
