@@ -260,5 +260,24 @@ Mutation rate: 50%
  Overweight count | Overweight rate | Best case weight | Avg. value | Best value | Best fitness |Best case count
                 0 |          0.00 % |              275 |     618.56 |        620 |          620 |             64
 Best case: A: 10  B: 10  C: 10  D: 10  E: 10  F: 9  G: 9  H: 1  I: 0  J: 0  
-Time taken: 844.66s
+Time taken: 844.66s
+```
+
+改為 Multi-processing 架構後，執行時間縮短約 40%
+
+```
+==================== STATISTIC ====================
+Selection type: Tournament
+Crossover type: Single-Point
+Mutation type: Single-Point
+Round: 100
+Generation: 500
+Population: 300
+Crossover rate: 50%
+Mutation rate: 50%
+
+ Overweight count | Overweight rate | Best case weight | Avg. value | Best value | Best fitness |Best case count
+                0 |          0.00 % |              275 |     618.72 |        620 |          620 |             68
+Best case: A: 10  B: 10  C: 10  D: 10  E: 10  F: 10  G: 7  H: 2  I: 0  J: 0  
+Time taken: 481.94 s
 ```

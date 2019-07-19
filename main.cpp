@@ -1,38 +1,44 @@
 #include "GA.h"
 #include "Statistic.h"
 #include <iostream>
-#include <time.h>
+#include <ctime>
 #include <unistd.h>
 
 using namespace std;
 
 int main() {
-    clock_t tStart = clock(); // count execution time
-
-    pid_t pid = 0;
-
-    for (int i = 0; i < 5; i++) {
-        if (pid == 0) {
-            tStart = clock(); // count execution time
-            pid = fork();
-        } else
-            break;
-    }
-
-    if (pid == 0) {
-        cout << "parent pid: " << pid << endl;
-    } else {
-        cout << "child pid: " << pid << endl;
-    }
-
     // Safety check
 #if K_POINT_CROSSOVER > GENE_LENGTH - 1
     cout << "ERROR: K_POINT_CROSSOVER is out of bound.";
-    return 0;
+    return -1;
 #endif
 
+    auto start = chrono::steady_clock::now();// count execution time
+
+    pid_t pid = 1;
+    int fd[2];
+    int *fdWrite = &fd[1];
+    int *fdRead = &fd[0];
+
+    if (pipe(fd) == -1) {
+        cout << "error occurred when pipe()" << endl;
+        return -1;
+    }
+
     for (int i = 0; i < ROUND; i++) {
-        cout << "Round " << (i + 1) << "/" << ROUND << endl;
+        if (pid > 0) {
+            pid = fork();
+        } else {
+            break;
+        }
+    }
+
+    if (pid < 0) {
+        cout << "error occurred when fork()" << endl;
+        return -1;
+    }
+
+    if (pid == 0) { // child process
         init();
 
         for (int j = 0; j < GENERATION; j++) {
@@ -52,16 +58,47 @@ int main() {
             mutateMP();
 #endif
         }
+
 #if EACH_ROUND_RESULT
         showResult();
 #endif
-        statistic();
-    }
-    finalResult();
 
-    wait(nullptr);
-    if (pid > 0)
-        exit(0);
-    printf("Time taken: %.2fs\n", (double) (clock() - tStart) / CLOCKS_PER_SEC); // print execution time
+#if DEBUG_MODE
+        cout << "in child process: ";
+        for (int i = 0; i < (RESULT_LENGTH); i++) {
+            cout << rs[i] << ' ';
+        }
+        cout << endl;
+#endif
+
+        close(*fdRead);
+        write(*fdWrite, getBestGeneArr(), sizeof(int) * (RESULT_LENGTH));
+        close(*fdWrite);
+
+    } else if (pid > 0) {
+        close(*fdWrite);
+
+        for (int i = 0; i < ROUND; i++) {
+            wait(nullptr);
+
+            int result[RESULT_LENGTH];
+            read(*fdRead, &result, sizeof(int) * RESULT_LENGTH);
+
+#if DEBUG_MODE
+            cout << "in main process: ";
+            for (int i = 0; i < (RESULT_LENGTH); i++) {
+                cout << result[i] << ' ';
+            }
+#endif
+            statistic(result);
+        }
+
+        close(*fdRead);
+
+        finalResult();
+
+        auto end = chrono::steady_clock::now();
+        cout << "Time taken: " << chrono::duration<double>(end - start).count() << " s" << endl;
+    }
     return 0;
 }

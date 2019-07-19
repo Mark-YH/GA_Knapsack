@@ -12,6 +12,7 @@ using namespace std;
 parent_t population[POPULATION_SIZE]; // population pool
 parent_t pool[POPULATION_SIZE]; // crossover pool
 parent_t bestGene;
+int rs[RESULT_LENGTH];
 
 void showState(); // print detail state of population. mainly use it as debugging.
 
@@ -483,8 +484,19 @@ void showResult() {
          << "\t fitness: " << bestGene.fitness << endl;
 }
 
-parent_t *getBestGene() {
-    return &bestGene;
+int *getBestGeneArr() {
+    memcpy(rs, bestGene.gene, sizeof(int) * GENE_LENGTH);
+    rs[GENE_LENGTH] = bestGene.weight;
+    rs[GENE_LENGTH + 1] = bestGene.value;
+    rs[GENE_LENGTH + 2] = bestGene.fitness;
+
+#if DEBUG_MODE
+    cout << "In func: ";
+    for (int i = 0; i < RESULT_LENGTH; i++)
+        cout << rs[i] << ' ';
+    cout << endl;
+#endif
+    return rs;
 }
 
 void swap(int *a, int *b) {

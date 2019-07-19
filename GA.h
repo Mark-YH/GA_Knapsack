@@ -2,12 +2,13 @@
 // Created by Mark Hsu on 2019-07-08.
 //
 
-#define GENERATION 500 // number of generation
-#define POPULATION_SIZE 300 // number of population
+#define GENERATION 1000 // number of generation
+#define POPULATION_SIZE 50 // number of population
 #define CROSSOVER_RATE 50 // percentage, e.g., 10 stands for  10%
 #define MUTATION_RATE 50 // percentage, e.g., 10 stands for  10%
 #define KNAPSACK_SIZE 275 // number of max knapsack size
 #define GENE_LENGTH 10 // length of gene
+#define RESULT_LENGTH (GENE_LENGTH + 3)
 
 /**
  * DEBUG_MODE 1: print debugging information
@@ -65,4 +66,4 @@ void mutateMP(); // multiple-point mutation
 
 void showResult(); // print result of current round
 
-parent_t *getBestGene();
+int *getBestGeneArr();
