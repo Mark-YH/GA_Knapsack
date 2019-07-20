@@ -3,6 +3,8 @@
 #include <iostream>
 #include <ctime>
 #include <unistd.h>
+#include <chrono>
+#include <sys/wait.h>
 
 using namespace std;
 
