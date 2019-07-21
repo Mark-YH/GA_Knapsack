@@ -59,25 +59,26 @@ int main() {
 #else
             mutateMP();
 #endif
+            if(j % 4 == 0)
+                cout << " Running         \r";
+            else if(j % 4 == 1)
+                cout << " Running...\r";
+            else if(j % 4 == 2)
+                cout << " Running......\r";
+            else
+                cout << " Running.........\r";
+            cout.flush();
         }
 
 #if EACH_ROUND_RESULT
         showResult();
 #endif
 
-#if DEBUG_MODE
-        cout << "in child process: ";
-        for (int i = 0; i < (RESULT_LENGTH); i++) {
-            cout << rs[i] << ' ';
-        }
-        cout << endl;
-#endif
-
         close(*fdRead);
-        write(*fdWrite, getBestGeneArr(), sizeof(int) * (RESULT_LENGTH));
+        write(*fdWrite, getBestGeneArr(), sizeof(int) * RESULT_LENGTH);
         close(*fdWrite);
 
-    } else if (pid > 0) {
+    } else { // parent process
         close(*fdWrite);
 
         for (int i = 0; i < ROUND; i++) {
@@ -88,7 +89,7 @@ int main() {
 
 #if DEBUG_MODE
             cout << "in main process: ";
-            for (int i = 0; i < (RESULT_LENGTH); i++) {
+            for (int i = 0; i < RESULT_LENGTH; i++) {
                 cout << result[i] << ' ';
             }
 #endif
