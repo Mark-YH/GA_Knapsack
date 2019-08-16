@@ -262,3 +262,74 @@ Mutation rate: 50%
 Best case: A: 10  B: 10  C: 10  D: 10  E: 10  F: 9  G: 9  H: 1  I: 0  J: 0  
 Time taken: 844.66s
 ```
+
+
+
+----
+
+ 
+
+二元編碼 100-bit 的版本
+
+
+```
+==================== STATISTIC ====================
+Selection type: Tournament
+Crossover type: Single-Point
+Mutation type: Multiple-Point
+Round: 1
+Generation: 500
+Population: 300
+Crossover rate: 50%
+Mutation rate: 20%
+
++----------+----------+----------+----------+----------+----------+----------+
+|Overweight|Overweight| Best case|   Avg.   |   Best   |   Best   | Best case|
+|   count  |   rate   |  weight  |   value  |   value  |  fitness |   count  |
++----------+----------+----------+----------+----------+----------+----------+
+|        0 |   0.00 % |      275 |   575.00 |      575 |      575 |        0 |
++----------+----------+----------+----------+----------+----------+----------+
+1	1	1	0	1	1	1	1	1	1	
+1	1	1	1	1	0	0	1	1	1	
+1	1	1	1	1	1	1	0	1	0	
+1	1	1	1	0	1	0	1	1	1	
+0	1	1	1	1	1	1	1	0	0	
+0	1	1	0	1	1	0	0	0	0	
+0	1	1	0	0	1	1	1	0	0	
+1	0	0	0	1	0	1	0	0	1	
+0	0	0	0	0	0	1	0	1	0	
+0	0	0	1	1	0	1	0	1	1	
+Best case: A: 9  B: 8  C: 8  D: 8  E: 7  F: 4  G: 5  H: 4  I: 2  J: 5  
+Time taken: 159.94s
+```
+
+```
+==================== STATISTIC ====================
+Selection type: Tournament
+Crossover type: Single-Point
+Mutation type: Multiple-Point
+Round: 10
+Generation: 500
+Population: 300
+Crossover rate: 50%
+Mutation rate: 50%
+
++----------+----------+----------+----------+----------+----------+----------+
+|Overweight|Overweight| Best case|   Avg.   |   Best   |   Best   | Best case|
+|   count  |   rate   |  weight  |   value  |   value  |  fitness |   count  |
++----------+----------+----------+----------+----------+----------+----------+
+|        0 |   0.00 % |      268 |   567.70 |      573 |      573 |        0 |
++----------+----------+----------+----------+----------+----------+----------+
+1	0	1	1	1	1	1	1	1	1	
+1	1	1	1	1	1	1	1	1	1	
+1	1	1	1	1	1	1	0	0	1	
+1	1	1	1	1	1	0	0	0	1	
+1	1	1	1	1	0	1	0	1	0	
+0	1	0	1	1	0	1	1	1	1	
+1	1	0	1	0	0	1	0	0	0	
+1	0	1	0	0	0	0	0	0	1	
+1	0	0	0	0	0	0	1	0	0	
+0	1	0	1	1	0	0	0	0	1	
+Best case: A: 9  B: 10  C: 8  D: 7  E: 7  F: 7  G: 4  H: 3  I: 2  J: 4  
+Time taken: 1668.44s
+```

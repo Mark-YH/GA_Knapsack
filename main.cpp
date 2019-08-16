@@ -6,12 +6,16 @@
 using namespace std;
 
 int main() {
-    clock_t tStart = clock(); // count execution time
+    auto start = chrono::steady_clock::now();// count execution time
 
     // Safety check
 #if K_POINT_CROSSOVER > GENE_LENGTH - 1
     cout << "ERROR: K_POINT_CROSSOVER is out of bound.";
     return 0;
+#endif
+
+#if EPIN_OUTPUT
+    fileOpen();
 #endif
 
     for (int i = 0; i < ROUND; i++) {
@@ -34,6 +38,10 @@ int main() {
 #else
             mutateMP();
 #endif
+
+#if EPIN_OUTPUT
+            outputEPIN(j);
+#endif
         }
 #if EACH_ROUND_RESULT
         showResult();
@@ -42,6 +50,11 @@ int main() {
     }
     finalResult();
 
-    printf("Time taken: %.2fs\n", (double) (clock() - tStart) / CLOCKS_PER_SEC); // print execution time
+#if EPIN_OUTPUT
+    fileClose();
+#endif
+
+    auto end = chrono::steady_clock::now();
+    cout << "Time taken: " << chrono::duration<double>(end - start).count() << " s" << endl;
     return 0;
 }

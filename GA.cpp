@@ -6,12 +6,14 @@
 #include <random>
 #include <iomanip>
 #include <cstring>
+#include <fstream>
 
 using namespace std;
 
 parent_t population[POPULATION_SIZE]; // population pool
 parent_t pool[POPULATION_SIZE]; // crossover pool
 parent_t bestGene;
+ofstream fileOut;
 
 void showState(); // print detail state of population. mainly use it as debugging.
 
@@ -25,7 +27,7 @@ void swap(int *, int *);
 void init() {
     for (int i = 0; i < POPULATION_SIZE; i++) {
         for (int j = 0; j < GENE_LENGTH; j++) {
-            population[i].gene[j] = myRandom(0, 10);
+            population[i].gene[j] = myRandom(0, 1);
         }
         calcFitness(&population[i]);
 
@@ -44,13 +46,42 @@ void init() {
 }
 
 void calcFitness(parent_t *x) {
+    // calculate its weight and value
     x->weight = 0;
     x->value = 0;
 
-    // calculate its weight and value
     for (int j = 0; j < GENE_LENGTH; j++) {
-        x->weight += x->gene[j] * weight[j];
-        x->value += x->gene[j] * value[j];
+        if (j < 10) {
+            x->weight += x->gene[j] * weight[0];
+            x->value += x->gene[j] * value[0];
+        } else if (j < 20) {
+            x->weight += x->gene[j] * weight[1];
+            x->value += x->gene[j] * value[1];
+        } else if (j < 30) {
+            x->weight += x->gene[j] * weight[2];
+            x->value += x->gene[j] * value[2];
+        } else if (j < 40) {
+            x->weight += x->gene[j] * weight[3];
+            x->value += x->gene[j] * value[3];
+        } else if (j < 50) {
+            x->weight += x->gene[j] * weight[4];
+            x->value += x->gene[j] * value[4];
+        } else if (j < 60) {
+            x->weight += x->gene[j] * weight[5];
+            x->value += x->gene[j] * value[5];
+        } else if (j < 70) {
+            x->weight += x->gene[j] * weight[6];
+            x->value += x->gene[j] * value[6];
+        } else if (j < 80) {
+            x->weight += x->gene[j] * weight[7];
+            x->value += x->gene[j] * value[7];
+        } else if (j < 90) {
+            x->weight += x->gene[j] * weight[8];
+            x->value += x->gene[j] * value[8];
+        } else {
+            x->weight += x->gene[j] * weight[9];
+            x->value += x->gene[j] * value[9];
+        }
     }
 
     // calculate its fitness
@@ -286,7 +317,8 @@ void crossoverKP() {
             bucket buckets[K_POINT_CROSSOVER + 1];
 
             // section1 <= range < section2
-            for (int j = 0; j < K_POINT_CROSSOVER + 1; j++) { // "K_POINT_CROSSOVER + 1" stands for the number of bucket
+            for (int j = 0;
+                 j < K_POINT_CROSSOVER + 1; j++) { // "K_POINT_CROSSOVER + 1" stands for the number of bucket
                 if (j == 0) { // first bucket
                     buckets[j].section1 = 0;
                     buckets[j].section2 = crossoverPoints[j];
@@ -307,7 +339,8 @@ void crossoverKP() {
             }
 
             // crossover process
-            for (int k = 0; k < K_POINT_CROSSOVER + 1; k++) { // "K_POINT_CROSSOVER + 1" stands for the number of bucket
+            for (int k = 0;
+                 k < K_POINT_CROSSOVER + 1; k++) { // "K_POINT_CROSSOVER + 1" stands for the number of bucket
                 for (int l = buckets[k].section1; l < buckets[k].section2; l++) {
                     // dispatching
                     if (k % 2) { // even number of bucket
@@ -383,7 +416,7 @@ void mutateSP() {
         // each individual has a chance to be a mutation point
         if ((myRandom(0, 99)) < MUTATION_RATE) {
             int pos = myRandom(0, GENE_LENGTH - 1); // set mutating position
-            population[i].gene[pos] = myRandom(0, 10);
+            population[i].gene[pos] = 1 - population[i].gene[pos];
 
             // calculate fitness as mutation happened
             calcFitness(&population[i]);
@@ -421,7 +454,7 @@ void mutateMP() {
         for (int pos = 0; pos < GENE_LENGTH; pos++) {
             // every single bit has a mutation chance
             if ((myRandom(0, 99)) < MUTATION_RATE) {
-                population[i].gene[pos] = myRandom(0, 10);
+                population[i].gene[pos] = 1 - population[i].gene[pos];
 
 #if DEBUG_MODE
                 cout << "[" << pos << "] ";
@@ -448,12 +481,13 @@ void mutateMP() {
 // Print each chromosome state
 void showState() {
     for (int i = 0; i < POPULATION_SIZE; i++) {
-        cout << "population[" << i << "]: ";
+        cout << "population[" << i << "]:" << endl;
 
         for (int j = 0; j < GENE_LENGTH; j++) {
-            cout << setw(2) << population[i].gene[j] << ' ';
+            cout << population[i].gene[j] << '\t';
+            if ((j + 1) % 10 == 0)
+                cout << endl;
         }
-        cout << endl;
     }
 
     for (int i = 0; i < POPULATION_SIZE; i++) {
@@ -470,11 +504,46 @@ void showState() {
 // Print the number of items taken
 void showResult() {
     cout << "========== Result at this round ==========" << endl;
-    cout << "Best case: ";
+    cout << "Best case:" << endl;
+
+    int count[10];
+    for (int i = 0; i < 10; i++) {
+        count[i] = 0;
+    }
+
+    for (int i = 0; i < GENE_LENGTH; i++) {
+        cout << bestGene.gene[i] << '\t';
+        if ((i + 1) % 10 == 0)
+            cout << endl;
+
+        if (bestGene.gene[i] == 1) {
+            if (i < 10) {
+                count[0]++;
+            } else if (i < 20) {
+                count[1]++;
+            } else if (i < 30) {
+                count[2]++;
+            } else if (i < 40) {
+                count[3]++;
+            } else if (i < 50) {
+                count[4]++;
+            } else if (i < 60) {
+                count[5]++;
+            } else if (i < 70) {
+                count[6]++;
+            } else if (i < 80) {
+                count[7]++;
+            } else if (i < 90) {
+                count[8]++;
+            } else {
+                count[9]++;
+            }
+        }
+    }
 
     // See how many each item is taken
-    for (int i = 0; i < GENE_LENGTH; i++) {
-        cout << name[i] << ": " << bestGene.gene[i] << "  ";
+    for (int i = 0; i < 10; i++) {
+        cout << name[i] << ": " << count[i] << "  ";
     }
     cout << endl;
 
@@ -525,4 +594,33 @@ int myRandom(int start, int end) {
     static default_random_engine gen = default_random_engine(rd());
     uniform_int_distribution<int> dis(start, end);
     return dis(gen);
+}
+
+
+void fileOpen() {
+    fileOut.open("../output/result.epin", ios::out);
+    fileOut << "Particle : " << endl;
+}
+
+void outputEPIN(int round) {
+    fileOut << '*' << (round + 1) << ' ';
+    fileOut << bestGene.fitness << ": ";
+    for (int i = 0; i < POPULATION_SIZE; i++) {
+        fileOut << population[i].fitness << ' ';
+        fileOut << "Bag" << (i + 1) << ' ';
+        for (int j = 0; j < GENE_LENGTH; j++) {
+            fileOut << population[i].gene[j] << ',';
+            fileOut << fixed << setprecision(1) << 0 << ',';
+            fileOut << "bit" << (j + 1);
+            if (j == GENE_LENGTH - 1)
+                fileOut << '/';
+            else
+                fileOut << ' ';
+        }
+    }
+    fileOut << endl;
+}
+
+void fileClose() {
+    fileOut.close();
 }

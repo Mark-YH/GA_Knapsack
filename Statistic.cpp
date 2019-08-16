@@ -15,8 +15,18 @@ int totalValue = 0;
 int bestValue = 0;
 int bestWeight = 0;
 int bestFitness = 0;
-int bestCase[10];
+int bestCase[GENE_LENGTH];
 int cntBestCase = 0;
+
+void prtLine() {
+    for (int i = 0; i < 78; i++) {
+        if (i % 11 == 0)
+            cout << '+';
+        else
+            cout << '-';
+    }
+    cout << endl;
+}
 
 bool isOverweight(int w) {
     return w > KNAPSACK_SIZE;
@@ -76,28 +86,78 @@ void finalResult() {
     cout << "Crossover rate: " << CROSSOVER_RATE << "%" << endl;
     cout << "Mutation rate: " << MUTATION_RATE << "%" << endl << endl;
 
-    cout << setw(17) << "Overweight count" << " |"
-         << setw(16) << "Overweight rate" << " |"
-         << setw(17) << "Best case weight" << " |"
-         << setw(11) << "Avg. value" << " |"
-         << setw(11) << "Best value" << " |"
-         << setw(13) << "Best fitness" << " |"
-         << setw(15) << "Best case count" << endl;
+    prtLine();
 
-    cout << setw(17) << cntOverweight << " |"
-         << setw(14) << fixed << setprecision(2) << cntOverweight / (float) ROUND * 100
+    cout << '|'
+         << setw(10) << "Overweight" << '|'
+         << setw(10) << "Overweight" << '|'
+         << setw(10) << "Best case" << '|'
+         << setw(10) << "Avg.   " << '|'
+         << setw(10) << "Best   " << '|'
+         << setw(10) << "Best   " << '|'
+         << setw(10) << "Best case" << '|' << endl;
+
+    cout << '|'
+         << setw(10) << "count  " << '|'
+         << setw(10) << "rate   " << '|'
+         << setw(10) << "weight  " << '|'
+         << setw(10) << "value  " << '|'
+         << setw(10) << "value  " << '|'
+         << setw(10) << "fitness " << '|'
+         << setw(10) << "count  " << '|' << endl;
+
+    prtLine();
+
+    cout << '|'
+         << setw(9) << cntOverweight << " |"
+         << setw(7) << fixed << setprecision(2) << cntOverweight / (float) ROUND * 100
          << setw(2) << " %" << " |"
-         << setw(17) << bestWeight << " |"
-         << setw(11) << setprecision(2) << totalValue / (float) ROUND << " |"
-         << setw(11) << bestValue << " |"
-         << setw(13) << bestFitness << " |"
-         << setw(15) << cntBestCase << endl;
+         << setw(9) << bestWeight << " |"
+         << setw(9) << setprecision(2) << totalValue / (float) ROUND << " |"
+         << setw(9) << bestValue << " |"
+         << setw(9) << bestFitness << " |"
+         << setw(9) << cntBestCase << " |" << endl;
+
+    prtLine();
+
+    int count[10];
+    for (int i = 0; i < 10; i++) {
+        count[i] = 0;
+    }
+
+    for (int i = 0; i < GENE_LENGTH; i++) {
+//        cout << bestCase[i] << '\t';
+//        if ((i + 1) % 10 == 0)
+//            cout << endl;
+
+        if (bestCase[i] == 1) {
+            if (i < 10) {
+                count[0]++;
+            } else if (i < 20) {
+                count[1]++;
+            } else if (i < 30) {
+                count[2]++;
+            } else if (i < 40) {
+                count[3]++;
+            } else if (i < 50) {
+                count[4]++;
+            } else if (i < 60) {
+                count[5]++;
+            } else if (i < 70) {
+                count[6]++;
+            } else if (i < 80) {
+                count[7]++;
+            } else if (i < 90) {
+                count[8]++;
+            } else {
+                count[9]++;
+            }
+        }
+    }
 
     cout << "Best case: ";
-    for (int k = 0; k < 10; k++) {
-        cout << name[k] << ": " << bestCase[k] << "  ";
+    for (int i = 0; i < 10; i++) {
+        cout << name[i] << ": " << count[i] << "  ";
     }
     cout << endl;
-
-    std::cout << "\007";
 }

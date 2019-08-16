@@ -7,7 +7,7 @@
 #define CROSSOVER_RATE 50 // percentage, e.g., 10 stands for  10%
 #define MUTATION_RATE 50 // percentage, e.g., 10 stands for  10%
 #define KNAPSACK_SIZE 275 // number of max knapsack size
-#define GENE_LENGTH 10 // length of gene
+#define GENE_LENGTH 100 // length of gene
 
 /**
  * DEBUG_MODE 1: print debugging information
@@ -18,6 +18,7 @@
  */
 #define DEBUG_MODE 0
 #define EACH_ROUND_RESULT 0
+#define EPIN_OUTPUT 0
 
 /**
  * SELECTION_TYPE 0: Tournament Selection
@@ -66,3 +67,9 @@ void mutateMP(); // multiple-point mutation
 void showResult(); // print result of current round
 
 parent_t *getBestGene();
+
+void fileOpen();
+
+void outputEPIN(int);
+
+void fileClose();
