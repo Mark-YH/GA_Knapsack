@@ -6,7 +6,7 @@
 using namespace std;
 
 int main() {
-    clock_t tStart = clock(); // count execution time
+    auto start = chrono::steady_clock::now();// count execution time
 
     // Safety check
 #if K_POINT_CROSSOVER > GENE_LENGTH - 1
@@ -42,6 +42,8 @@ int main() {
     }
     finalResult();
 
-    printf("Time taken: %.2fs\n", (double) (clock() - tStart) / CLOCKS_PER_SEC); // print execution time
+    // count execution time
+    auto end = chrono::steady_clock::now();
+    cout << "Time taken: " << chrono::duration<double>(end - start).count() << " s" << endl;
     return 0;
 }
