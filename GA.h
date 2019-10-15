@@ -35,6 +35,14 @@
 #define CROSSOVER_TYPE 0
 #define K_POINT_CROSSOVER 3
 #define MUTATION_TYPE 0
+/**
+ * CALC_FITNESS_MODE 1:
+ *      Calculating fitness by drop the lowest CP ratio item while it's overweight.
+ *
+ * CALC_FITNESS_MODE 0:
+ *      Calculating fitness by punishment coefficient while it's overweight.
+ */
+#define CALC_FITNESS_MODE 1
 
 typedef struct tag_parent_t {
     int gene[GENE_LENGTH];

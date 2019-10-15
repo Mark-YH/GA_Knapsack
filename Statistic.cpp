@@ -80,43 +80,43 @@ void finalResult() {
     cout << "Mutation type: Multiple-Point" << endl;
 #endif
 
-    cout << "Round: " << ROUND << endl;
+    cout << "Statistic round: " << ROUND << endl;
     cout << "Generation: " << GENERATION << endl;
     cout << "Population: " << POPULATION_SIZE << endl;
     cout << "Crossover rate: " << CROSSOVER_RATE << "%" << endl;
-    cout << "Mutation rate: " << MUTATION_RATE << "%" << endl << endl;
+    cout << "Mutation rate: " << MUTATION_RATE << "%" << endl;
 
     prtLine();
 
     cout << '|'
-         << setw(10) << "Overweight" << '|'
-         << setw(10) << "Overweight" << '|'
-         << setw(10) << "Best case" << '|'
-         << setw(10) << "Avg.   " << '|'
-         << setw(10) << "Best   " << '|'
-         << setw(10) << "Best   " << '|'
-         << setw(10) << "Best case" << '|' << endl;
+         << setw(10) << "Overweight" << '|'     // col. 1
+         << setw(10) << "Overweight" << '|'     // col. 2
+         << setw(10) << "Best case" << '|'      // col. 3
+         << setw(10) << "Avg.   " << '|'        // col. 4
+         << setw(10) << "Best   " << '|'        // col. 5
+         << setw(10) << "Best   " << '|'        // col. 6
+         << setw(10) << "Best case" << '|' << endl; // col. 7
 
     cout << '|'
-         << setw(10) << "count  " << '|'
-         << setw(10) << "rate   " << '|'
-         << setw(10) << "weight  " << '|'
-         << setw(10) << "value  " << '|'
-         << setw(10) << "value  " << '|'
-         << setw(10) << "fitness " << '|'
-         << setw(10) << "count  " << '|' << endl;
+         << setw(10) << "count  " << '|'        // col. 1
+         << setw(10) << "rate   " << '|'        // col. 2
+         << setw(10) << "weight  " << '|'       // col. 3
+         << setw(10) << "value  " << '|'        // col. 4
+         << setw(10) << "value  " << '|'        // col. 5
+         << setw(10) << "fitness " << '|'       // col. 6
+         << setw(10) << "count  " << '|' << endl; // col. 7
 
     prtLine();
 
     cout << '|'
-         << setw(9) << cntOverweight << " |"
-         << setw(7) << fixed << setprecision(2) << cntOverweight / (float) ROUND * 100
+         << setw(9) << cntOverweight << " |"    // col. 1
+         << setw(7) << fixed << setprecision(2) << cntOverweight / (double) ROUND * 100  // col. 2
          << setw(2) << " %" << " |"
-         << setw(9) << bestWeight << " |"
-         << setw(9) << setprecision(2) << totalValue / (float) ROUND << " |"
-         << setw(9) << bestValue << " |"
-         << setw(9) << bestFitness << " |"
-         << setw(9) << cntBestCase << " |" << endl;
+         << setw(9) << bestWeight << " |"       // col. 3
+         << setw(9) << setprecision(2) << totalValue / (double) ROUND << " |"    // col. 4
+         << setw(9) << bestValue << " |"        // col. 5
+         << setw(9) << bestFitness << " |"      // col. 6
+         << setw(9) << cntBestCase << " |" << endl; // col. 7
 
     prtLine();
 
@@ -125,6 +125,4 @@ void finalResult() {
         cout << name[k] << ": " << bestCase[k] << "  ";
     }
     cout << endl;
-
-    std::cout << "\007";
 }
