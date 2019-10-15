@@ -45,6 +45,52 @@ void init() {
 #endif
 }
 
+void processOW(parent_t *x) {
+    // drop an item which is the lowest cost-performance ratio one
+    for (int i = GENE_LENGTH - 1; i >= 0; i--) {
+        if (x->gene[i] == 1) {
+            x->gene[i] = 0;
+
+            if (i >= 90) {
+                x->weight -= weight[9];
+                x->value -= value[9];
+            } else if (i >= 80) {
+                x->weight -= weight[8];
+                x->value -= value[8];
+            } else if (i >= 70) {
+                x->weight -= weight[7];
+                x->value -= value[7];
+            } else if (i >= 60) {
+                x->weight -= weight[6];
+                x->value -= value[6];
+            } else if (i >= 50) {
+                x->weight -= weight[5];
+                x->value -= value[5];
+            } else if (i >= 40) {
+                x->weight -= weight[4];
+                x->value -= value[4];
+            } else if (i >= 30) {
+                x->weight -= weight[3];
+                x->value -= value[3];
+            } else if (i >= 20) {
+                x->weight -= weight[2];
+                x->value -= value[2];
+            } else if (i >= 10) {
+                x->weight -= weight[1];
+                x->value -= value[1];
+            } else {
+                x->weight -= weight[0];
+                x->value -= value[0];
+            }
+
+            if (x->weight <= KNAPSACK_SIZE) {
+                x->fitness = x->value;
+                break;
+            }
+        }
+    }
+}
+
 void calcFitness(parent_t *x) {
     // calculate its weight and value
     x->weight = 0;
@@ -88,8 +134,12 @@ void calcFitness(parent_t *x) {
     if (x->weight <= KNAPSACK_SIZE) {
         x->fitness = x->value;
     } else {
+#if CALC_FITNESS_MODE
+        processOW(x);
+#else
         // it got a punishment coefficient if it is overweight
         x->fitness = x->value * (0.9 - ((x->weight - KNAPSACK_SIZE) / (float) (2 * KNAPSACK_SIZE)));
+#endif
     }
 }
 

@@ -2,8 +2,8 @@
 // Created by Mark Hsu on 2019-07-08.
 //
 
-#define GENERATION 500 // number of generation
-#define POPULATION_SIZE 300 // number of population
+#define GENERATION 1000 // number of generation
+#define POPULATION_SIZE 20 // number of population
 #define CROSSOVER_RATE 50 // percentage, e.g., 10 stands for  10%
 #define MUTATION_RATE 50 // percentage, e.g., 10 stands for  10%
 #define KNAPSACK_SIZE 275 // number of max knapsack size
@@ -36,6 +36,14 @@
 #define CROSSOVER_TYPE 0
 #define K_POINT_CROSSOVER 3
 #define MUTATION_TYPE 0
+/**
+ * CALC_FITNESS_MODE 1:
+ *      Calculating fitness by drop the lowest CP ratio item while it's overweight.
+ *
+ * CALC_FITNESS_MODE 0:
+ *      Calculating fitness by punishment coefficient while it's overweight.
+ */
+#define CALC_FITNESS_MODE 1
 
 typedef struct tag_parent_t {
     int gene[GENE_LENGTH];
